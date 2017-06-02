@@ -2,7 +2,7 @@ create database ekshiksha_gamification;
 use ekshiksha_gamification;
 
 create table student (
-	id int(10) unsigned auto_increment primary key, 
+	id varchar(30) primary key, 
 	name varchar(256) not null,
 	email varchar(256) not null,
 	school_id int(10) unsigned,
@@ -12,7 +12,7 @@ create table student (
 ) auto_increment=0;
 
 create table teacher (
-	id int(10) unsigned auto_increment primary key, 
+	id varchar(30) primary key, 
 	name varchar(256) not null,
 	email varchar(256) not null,
 	school_id int(10) unsigned,
@@ -20,14 +20,14 @@ create table teacher (
 ) auto_increment=0;
 
 create table school(
-	id int(10) unsigned auto_increment primary key,
+	id varchar(30) primary key,
 	name varchar(256) not null,
 	city varchar(256) not null,
 	state varchar(256) not null
 ) auto_increment=0;
 
 create table activity (
-	id int(10) unsigned auto_increment primary key,
+	id varchar(30) primary key,
 	name varchar(256) not null,
 	icon_link varchar(256),
 	program_link varchar(256) not null,
@@ -38,7 +38,7 @@ create table activity (
 ) auto_increment=0;
 
 create table game(
-	id int(10) unsigned auto_increment primary key,
+	id varchar(30) primary key,
 	icon_link varchar(256),
 	teacher_id int(10) not null,
 	creation_date date
@@ -47,11 +47,11 @@ create table game(
 create table gameActivity(
 	game_id int(10) unsigned not null,
 	activity_id int(10) unsigned not null,
-	pair_id int(10) unsigned auto_increment primary key
+	pair_id int(10) auto_increment primary key
 ) auto_increment=0;
 
 create table topic(
-	id int(10) unsigned auto_increment primary key,
+	id varchar(30) primary key,
 	name varchar(256) not null
 ) auto_increment=0;
 
@@ -69,7 +69,7 @@ create table path (
 );
 
 create table story_scene(
-	id int(10) unsigned auto_increment primary key,
+	id int(10) primary key,
 	image_link varchar(256) not null,
 	text varchar(256) not null
 ) auto_increment=0;

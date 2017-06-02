@@ -21,10 +21,9 @@
                 <div>
                     <a href="/"><img alt="Gamification" src="/img/logo.png"/></a>
                 </div>
-                <?php if (!empty($_SESSION["id"])): ?>
+                <?php if (!empty($_SESSION["id"]) && $_SESSION["type"]==1 ): ?>
                     <ul class="nav nav-pills">
                         <li><a href="index.php">Home</a></li>
-                        <li><a href="dashboard.php">Dashboard</a></li>
                         <li><a href="create_game.php">Gamify</a></li>
                         <li><a href="stats.php">Assess</a></li>
                         <li><a href="logout.php"><strong>Log Out</strong></a></li>
