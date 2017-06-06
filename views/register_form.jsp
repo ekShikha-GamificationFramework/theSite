@@ -1,7 +1,7 @@
-<form action="register.php" method="post">
+<form action="../public/register.jsp" method="post">
     <fieldset>
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="userid" placeholder="Username" type="text"/>
+            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"/>
         </div>
         <div class="form-group">
             <input class="form-control" name="name" placeholder="Name" type="text"/>

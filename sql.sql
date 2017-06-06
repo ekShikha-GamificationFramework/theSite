@@ -1,5 +1,5 @@
-create database ekshiksha_gamification;
-use ekshiksha_gamification;
+create database iitb;
+use iitb;
 
 create table student (
 	id varchar(30) primary key, 
@@ -20,14 +20,14 @@ create table teacher (
 ) auto_increment=0;
 
 create table school(
-	id varchar(30) primary key,
+	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null,
 	city varchar(256) not null,
 	state varchar(256) not null
 ) auto_increment=0;
 
 create table activity (
-	id varchar(30) primary key,
+	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null,
 	icon_link varchar(256),
 	program_link varchar(256) not null,
@@ -38,11 +38,12 @@ create table activity (
 ) auto_increment=0;
 
 create table game(
-	id varchar(30) primary key,
+	id int(10) unsigned auto_increment primary key,
+	name varchar(256) not null,
 	icon_link varchar(256),
 	teacher_id int(10) not null,
 	creation_date date
-);
+) auto_increment=0;
 
 create table gameActivity(
 	game_id int(10) unsigned not null,

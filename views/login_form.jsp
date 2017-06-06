@@ -1,4 +1,4 @@
-<form action="login.php" method="post">
+<form action="../public/login.jsp" method="POST">
     <fieldset>
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"/>
@@ -15,5 +15,5 @@
     </fieldset>
 </form>
 <div>
-    or <a href="register.php">register</a> for an account
+    or <a href="../public/register.jsp">register</a> for an account
 </div>
