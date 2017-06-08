@@ -70,7 +70,7 @@ create table path (
 );
 
 create table story_scene(
-	id int(10) primary key,
-	image_link varchar(256) not null,
-	text varchar(256) not null
+	id  int(10) unsigned auto_increment primary key,
+	name varchar(256) not null,
+	link varchar(256)
 ) auto_increment=0;
