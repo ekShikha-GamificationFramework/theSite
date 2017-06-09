@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="../public/css/alchemy.min.css"/>
 <link rel="stylesheet" href="../public/css/vendor.css"/>
 <script src="../public/js/d3.v3.min.js"></script>
-<script src="../public/js/alchemy.min.js"></script>
+<script src="../public/js/alchemy.js"></script>
 <script src="../public/js/vendor.js"></script>
 
 <div class="alchemy" id="alchemy" style="height:70vh; width:80vw"></div>
@@ -103,9 +103,11 @@
 </div>
 
 <%
-	st=con.prepareStatement("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'activity' AND table_schema = DATABASE()");
-	rs=st.executeQuery();
-	rs.next();
+
+st=con.prepareStatement("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'activity' AND table_schema = DATABASE()");
+rs=st.executeQuery();
+rs.next();
+
 %>
 
 <script type="text/javascript">
@@ -114,9 +116,11 @@
 </script>
 
 <%
-	st=con.prepareStatement("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'story_scene' AND table_schema = DATABASE()");
-	rs=st.executeQuery();
-	rs.next();
+
+st=con.prepareStatement("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'story_scene' AND table_schema = DATABASE()");
+rs=st.executeQuery();
+rs.next();
+
 %>
 
 <script type="text/javascript">
@@ -143,7 +147,12 @@
     	});
 
     	newActivityID++;
-    	alchemy = new Alchemy(config);
+    	var myNode = document.getElementById("alchemy");
+		while (myNode.firstChild) {
+		    myNode.removeChild(myNode.firstChild);
+		}
+
+		alchemy = new Alchemy(config);
     }
 
     function sceneUploader(){
@@ -168,7 +177,15 @@
 	    		"target" : parseInt(act2),
 	    		"caption" : document.getElementById('sel3').selectedOptions[0].innerText
 	    	});
-    		alchemy = new Alchemy(config);
+	    	
+	    	//couldn't figure out how to add new nodes dynamically
+	    	//so deleting the previous graph
+	    	var myNode = document.getElementById("alchemy");
+			while (myNode.firstChild) {
+			    myNode.removeChild(myNode.firstChild);
+			}
+
+			alchemy = new Alchemy(config);
     	}    	
     }
 
