@@ -43,63 +43,65 @@
 </script>
 
 <div class="sidenav">
-	<input type="text" id="theName" placeholder="Activity Name"/>
-	<input type="text" id="theClass" placeholder="Class"/>
-	<input type="text" id="theScore" placeholder="Maximum Score"/>
-	<input type="file" placeholder="Icon File" id="iconFile"/>
-	<input type="file" placeholder="Activity File" id="activityFile"/>
-	<select>
-	<%
-		st=con.prepareStatement("select * from topic");
-		rs=st.executeQuery();
-		while(rs.next()){
-			out.println("<option value="+ rs.getInt(1)+">"+ rs.getString(2) +"</option>");
-		}	
-	%>
-	</select>
-	<br>
-	<button class="btn btn-default" onclick="activityUploader()" style="margin-top:10px; margin-bottom:10px">
-        Add activity
-    </button>
-    
-    <input type="text" id="sceneName" placeholder="Scene Name"/>
-    <input type="file" placeholder="Activity File" id="sceneMedia"/>
-	<button class="btn btn-default" onclick="sceneUploader()" style="margin-top:10px; margin-bottom:10px">
-        Add scene
-    </button>
-    <br/>
-   
+	<div class="form-group">
+		<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
+		<input class="form-control" type="text" id="theClass" placeholder="Class"/>
+		<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
+		<input class="form-control" type="file" placeholder="Icon File" id="iconFile"/>
+		<input class="form-control" type="file" placeholder="Activity File" id="activityFile"/>
+		<select class="form-control">
+		<%
+			st=con.prepareStatement("select * from topic");
+			rs=st.executeQuery();
+			while(rs.next()){
+				out.println("<option value="+ rs.getInt(1)+">"+ rs.getString(2) +"</option>");
+			}	
+		%>
+		</select>
+		<br>
+		<button class="btn btn-default" onclick="activityUploader()" style="margin-top:10px; margin-bottom:10px">
+	        Add activity
+	    </button>
+	    
+	    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
+	    <input class="form-control" type="file" placeholder="Activity File" id="sceneMedia"/>
+		<button class="btn btn-default" onclick="sceneUploader()" style="margin-top:10px; margin-bottom:10px">
+	        Add scene
+	    </button>
+	    <br/>
+	   
 
-	<span style="color:white">Activity #1</span>
-    <select id="sel1">
-    	<% out.println(s); %>
-    </select>
+		<span style="color:white">Activity #1</span>
+	    <select class="form-control" id="sel1">
+	    	<% out.println(s); %>
+	    </select>
 
-    <br>
-    
-    <span style="color:white">Activity #2</span>
-    <select id="sel2">
-    	<% out.println(s); %>
-    </select>
-    
-    <br>
-    
-    <span style="color:white">Connecting Scene</span>
-    <select id="sel3">
-    	<%
-    	st=con.prepareStatement("select id, name from story_scene");
-    	rs=st.executeQuery();
-    	while(rs.next()){
-    		out.println("<option value="+rs.getInt(1)+">"+rs.getString(2)+"</option>");
-    	}
-    	%>
-    </select>
+	    <br>
+	    
+	    <span style="color:white">Activity #2</span>
+	    <select class="form-control" id="sel2">
+	    	<% out.println(s); %>
+	    </select>
+	    
+	    <br>
+	    
+	    <span style="color:white">Connecting Scene</span>
+	    <select id="sel3" class="form-control">
+	    	<%
+	    	st=con.prepareStatement("select id, name from story_scene");
+	    	rs=st.executeQuery();
+	    	while(rs.next()){
+	    		out.println("<option value="+rs.getInt(1)+">"+rs.getString(2)+"</option>");
+	    	}
+	    	%>
+	    </select>
 
-    <br>
-    
-    <button class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
-        Connect
-    </button>
+	    <br>
+	    
+	    <button class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
+	        Connect
+	    </button>
+    </div>
 </div>
 
 <%

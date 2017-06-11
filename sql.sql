@@ -52,7 +52,7 @@ create table gameActivity(
 ) auto_increment=0;
 
 create table topic(
-	id varchar(30) primary key,
+	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null
 ) auto_increment=0;
 
@@ -70,7 +70,7 @@ create table path (
 );
 
 create table story_scene(
-	id  int(10) unsigned auto_increment primary key,
+	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null,
 	link varchar(256)
 ) auto_increment=0;

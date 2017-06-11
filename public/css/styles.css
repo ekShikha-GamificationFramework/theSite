@@ -51,9 +51,7 @@
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
 }
 
-input[type="file"], textarea {
-  background-color : #d1d1d1; 
-}
+
 
 /* The navigation menu links */
 .sidenav a {
