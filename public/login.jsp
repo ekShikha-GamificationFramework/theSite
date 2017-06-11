@@ -39,6 +39,7 @@
 			if(rs.next()==true){
 				if(((String)request.getParameter("password")).equals(rs.getString(5))){
 					session.setAttribute("id", request.getParameter("username"));
+					session.setAttribute("type", request.getParameter("type"));
 					response.sendRedirect("/gamification-Site/public/index.jsp");
 				}
 				else{%>

@@ -23,11 +23,17 @@
                     <a href="/gamification-Site/public/index.jsp"><img alt="Gamification" src="/gamification-Site/public/img/logo.png"/></a>
                 </div>
                 <% if (session.getAttribute("id")!=null){ %>
-               
+	                
                     <ul class="nav nav-pills">
-                        <li><a href="index.jsp">Home</a></li>
-                        <li><a href="gamify.jsp">Gamify</a></li>
-                        <li><a href="stats.jsp">Assess</a></li>
+                        <li><a href="index.jsp">Home</a></li><%
+                        if(session.getAttribute("type").equals("Teacher")){%>
+                        	<li><a href="gamify.jsp">Gamify</a></li>
+                        	<li><a href="stats.jsp">Assess</a></li>
+                        <%}
+                        else{%>
+                        	<li><a href="leaderboard.jsp">Leaderboard</a></li>
+                    	<%}
+                        %>
                         <li><a href="logout.jsp"><strong>Log Out</strong></a></li>
                     </ul>
 
