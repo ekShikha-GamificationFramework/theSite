@@ -194,8 +194,14 @@ rs.next();
 	var request;  
 
 	//dict has all the table row values
-	function sendInfo(table, dict){  
-		var url="index.jsp?val="+v;  
+	//type - select/insert/update
+	function sendInfo(table, type, dict){  
+		var url="../includes/ajaxHandler.jsp?table="+table+"&type="+type;  
+		var keys = Object.keys(dict);
+
+		for(a in keys){
+			url=url+"&"+a+"="+dict[a];
+		}
 
 		if(window.XMLHttpRequest){  
 			request=new XMLHttpRequest();  
@@ -205,7 +211,8 @@ rs.next();
 		}  
 
 		try{  
-			// request.onreadystatechange=getInfo;  
+			if(type=="s")
+				request.onreadystatechange=getInfo;  
 			request.open("GET", url, true);  
 			request.send();  
 		}
@@ -213,5 +220,9 @@ rs.next();
 			alert("Unable to connect to server");
 		}  
 	}  
+
+	function getInfo(){
+		
+	}
 
 </script>

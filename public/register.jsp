@@ -1,4 +1,11 @@
 <%@ page import ="java.sql.*" %>
+
+<%
+	if(session.getAttribute("id")!=null){
+		response.sendRedirect("index.jsp");
+	}
+%>
+
 <%
 	if("GET".equals(request.getMethod())){%>
 		<jsp:include page = "../views/header.jsp" flush = "true">

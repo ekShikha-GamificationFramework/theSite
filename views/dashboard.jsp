@@ -9,7 +9,8 @@
 		PreparedStatement st = con.prepareStatement("select * from game");
 		ResultSet rs=st.executeQuery();
 		while(rs.next()){
-			out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4)+"<br>");
+			out.println("<div class=\"games\"><a href=play.jsp?id="+rs.getString(1)+"><img width=200px height=200px src="+rs.getString(3)+"></img></a>");
+			out.println(rs.getString(2)+" by "+rs.getString(4)+"</div>");
 		} 
 		con.close();
 	}
