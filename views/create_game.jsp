@@ -1,4 +1,4 @@
-<%@ page import ="java.sql.*" %>
+<%@ page import ="java.sql.*" %>	
 
 <link rel="stylesheet" href="../public/css/alchemy.min.css"/>
 <link rel="stylesheet" href="../public/css/vendor.css"/>
@@ -22,6 +22,7 @@
 %>
 
 <script type="text/javascript">
+var thestring;
 	var gameMapData = {
 		"nodes": [],
 		"edges": []
@@ -47,9 +48,9 @@
 		<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
 		<input class="form-control" type="text" id="theClass" placeholder="Class"/>
 		<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
-		<input class="form-control" type="file" placeholder="Icon File" id="iconFile"/>
-		<input class="form-control" type="file" placeholder="Activity File" id="activityFile"/>
-		<select class="form-control">
+		<input class="form-control" type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
+		<input class="form-control" type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
+		<select class="form-control" id="theTopics">
 		<%
 			st=con.prepareStatement("select * from topic");
 			rs=st.executeQuery();
@@ -64,7 +65,7 @@
 	    </button>
 	    
 	    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
-	    <input class="form-control" type="file" placeholder="Activity File" id="sceneMedia"/>
+	    <input class="form-control" type="text" placeholder="Activity Link" id="sceneMedia"/>
 		<button class="btn btn-default" onclick="sceneUploader()" style="margin-top:10px; margin-bottom:10px">
 	        Add scene
 	    </button>
@@ -134,8 +135,21 @@ rs.next();
 	//add this to script.js
 	//or maybe not
     function activityUploader(){
+    	
+    	var c = document.getElementById("theName").value;
+    	var d = document.getElementById("theClass").value;
+    	var e = document.getElementById("theScore").value;
+    	var f = document.getElementById("theIcon").value;
+    	var g = document.getElementById("theLink").value;
+
+    	if(c=="" || d=="" || e=="" || f=="" || g==""){
+    		alert("Don't leave it empty!");
+    		return;
+    	}
+
     	var a = document.createElement("option");
     	var b = document.createElement("option");
+
 
     	a.text=b.text=document.getElementById("theName").value;
     	a.value=b.value=newActivityID;
@@ -145,7 +159,7 @@ rs.next();
     	
     	gameMapData.nodes.push({
     		"id" : newActivityID,
-    		"name" : document.getElementById("theName").value
+    		"name" : c
     	});
 
     	newActivityID++;
@@ -155,17 +169,33 @@ rs.next();
 		}
 
 		alchemy = new Alchemy(config);
+
+		sendInfo("activity", "i", {
+			"name" : c,
+			"icon_link" : f,
+			"program_link" : g, 
+			"class" : d,
+			"max_score" : e,
+			"topic_id" : document.getElementById("theTopics").value,
+			"creation_date" : new Date().toJSON().slice(0,10)
+		});
     }
 
     function sceneUploader(){
+    	var b = document.getElementById("sceneMedia").value;
+    	var c = document.getElementById("sceneName").value;
+    	if(b=="" || c==""){
+    		alert("Don't leave it empty!");
+    		return;
+    	}
     	var a = document.createElement("option");
     	a.value=newSceneID;
-    	a.text=document.getElementById("sceneName").value;
+    	a.text=c;
     	document.getElementById("sel3").appendChild(a);
    
     	newSceneID++;
 
-    	// sendInfo("story_scene", {"name" : })
+    	sendInfo("story_scene", "i", {"name" : c, "link": b});
     }
 
     function activityConnector(){
@@ -194,14 +224,17 @@ rs.next();
 	var request;  
 
 	//dict has all the table row values
-	//type - select/insert/update
+	//type - select/insert/update -> s,i,u
 	function sendInfo(table, type, dict){  
 		var url="../includes/ajaxHandler.jsp?table="+table+"&type="+type;  
 		var keys = Object.keys(dict);
 
-		for(a in keys){
+
+		for(a of keys){
 			url=url+"&"+a+"="+dict[a];
 		}
+
+		thestring=url;
 
 		if(window.XMLHttpRequest){  
 			request=new XMLHttpRequest();  

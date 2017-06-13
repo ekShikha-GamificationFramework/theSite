@@ -50,12 +50,12 @@
 				st.setInt(4, schoolID);
 				st.setString(5, request.getParameter("password"));
 				st.executeUpdate();
-
+				con.close();
 				session.setAttribute("id", request.getParameter("username"));
 
 				response.sendRedirect("/gamification-Site/public/index.jsp");
 
-				con.close();
+				
 			}
 			
 			catch(Exception e){
