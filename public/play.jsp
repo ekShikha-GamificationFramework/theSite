@@ -1,9 +1,5 @@
 <%@ page import="java.sql.*" %>
-
-<jsp:include page = "../views/header.jsp" flush = "true">
-	<jsp:param name="title" value="Play!" />
-</jsp:include>
-
+<link rel="stylesheet" href="../public/css/styles.css"/>
 <%
 	if(request.getParameter("id")==null){
 		response.sendRedirect("index.jsp");
@@ -27,13 +23,14 @@
 	}
 	else{%>
 
-		<div style="height:75vh; width:80vw; background-color: black; margin:0 auto;" id="gameSpace">
-			<object type="text/html" data<% out.println("="+rs.getString(1)); %> style="height:75vh; width:80vw; margin:0 auto;">
+		<div style="height:97vh; width:80vw; background-color: black; margin-top:0 auto; margin-left: 18vw" id="gameSpace">
+			<object type="text/html" data<% out.println("="+rs.getString(1)); %> style="height:97vh; width:80vw; margin:0 auto;">
 		    </object>
 		</div>
 
 	<%}
 %>
 
+<div class="sidenav">
 
-<jsp:include page = "../views/footer.jsp" flush = "true" /> 
+</div>

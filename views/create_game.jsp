@@ -22,7 +22,8 @@
 %>
 
 <script type="text/javascript">
-var thestring;
+	var activities=[];
+	var scenes=[];
 	var gameMapData = {
 		"nodes": [],
 		"edges": []
@@ -60,13 +61,13 @@ var thestring;
 		%>
 		</select>
 		<br>
-		<button class="btn btn-default" onclick="activityUploader()" style="margin-top:10px; margin-bottom:10px">
+		<button class="btn btn-default" onclick="activityAdder()" style="margin-top:10px; margin-bottom:10px">
 	        Add activity
 	    </button>
 	    
 	    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
 	    <input class="form-control" type="text" placeholder="Activity Link" id="sceneMedia"/>
-		<button class="btn btn-default" onclick="sceneUploader()" style="margin-top:10px; margin-bottom:10px">
+		<button class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
 	        Add scene
 	    </button>
 	    <br/>
@@ -102,6 +103,11 @@ var thestring;
 	    <button class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
 	        Connect
 	    </button>
+	    <br>
+	    <input class="form-control" type="text" id="gameName" placeholder="Name your Game!"/>
+	    <button class="btn btn-default" onclick="activityUploader(); sceneUploader();" style="margin-top:10px; margin-bottom:10px">
+	        Create Game
+	    </button>
     </div>
 </div>
 
@@ -134,7 +140,7 @@ rs.next();
 <script type="text/javascript">
 	//add this to script.js
 	//or maybe not
-    function activityUploader(){
+    function activityAdder(){
     	
     	var c = document.getElementById("theName").value;
     	var d = document.getElementById("theClass").value;
@@ -151,7 +157,7 @@ rs.next();
     	var b = document.createElement("option");
 
 
-    	a.text=b.text=document.getElementById("theName").value;
+    	a.text=b.text=c
     	a.value=b.value=newActivityID;
 
     	document.getElementById("sel1").appendChild(a);
@@ -170,7 +176,7 @@ rs.next();
 
 		alchemy = new Alchemy(config);
 
-		sendInfo("activity", "i", {
+		activities.push({
 			"name" : c,
 			"icon_link" : f,
 			"program_link" : g, 
@@ -179,9 +185,15 @@ rs.next();
 			"topic_id" : document.getElementById("theTopics").value,
 			"creation_date" : new Date().toJSON().slice(0,10)
 		});
+
+		document.getElementById("theName").value="";
+    	document.getElementById("theClass").value="";
+    	document.getElementById("theScore").value="";
+    	document.getElementById("theIcon").value="";
+    	document.getElementById("theLink").value="";
     }
 
-    function sceneUploader(){
+    function sceneAdder(){
     	var b = document.getElementById("sceneMedia").value;
     	var c = document.getElementById("sceneName").value;
     	if(b=="" || c==""){
@@ -195,7 +207,10 @@ rs.next();
    
     	newSceneID++;
 
-    	sendInfo("story_scene", "i", {"name" : c, "link": b});
+    	scenes.push({"name" : c, "link": b});
+    	
+    	document.getElementById("sceneMedia").value="";
+    	document.getElementById("sceneName").value="";
     }
 
     function activityConnector(){
@@ -221,6 +236,28 @@ rs.next();
     	}    	
     }
 
+    function activityUploader(){
+    	for(obj of activities){
+    		sendInfo("activity", "i", {
+				"name" : obj.name,
+				"icon_link" : obj.icon_link,
+				"program_link" : obj.program_link, 
+				"class" : obj.class,
+				"max_score" : obj.max_score,
+				"topic_id" : obj.topic_id,
+				"creation_date" : obj.creation_date
+			});
+    	}
+    	activities=[];
+    }
+
+    function sceneUploader(){
+    	for(obj of scenes){
+    		sendInfo("story_scene", "i", {"name" : obj.name, "link": obj.link});
+    	}
+    	scenes=[];
+    }
+
 	var request;  
 
 	//dict has all the table row values
@@ -229,12 +266,9 @@ rs.next();
 		var url="../includes/ajaxHandler.jsp?table="+table+"&type="+type;  
 		var keys = Object.keys(dict);
 
-
 		for(a of keys){
 			url=url+"&"+a+"="+dict[a];
 		}
-
-		thestring=url;
 
 		if(window.XMLHttpRequest){  
 			request=new XMLHttpRequest();  
@@ -244,8 +278,7 @@ rs.next();
 		}  
 
 		try{  
-			if(type=="s")
-				request.onreadystatechange=getInfo;  
+			if(type=="s")	request.onreadystatechange=getInfo;  
 			request.open("GET", url, true);  
 			request.send();  
 		}
