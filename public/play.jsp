@@ -1,5 +1,13 @@
 <%@ page import="java.sql.*" %>
 <link rel="stylesheet" href="../public/css/styles.css"/>
+
+<script type="text/javascript">
+	var fetchedGameMapData = {
+		"nodes": [],
+		"edges": []
+	};
+</script>
+
 <%
 	if(request.getParameter("id")==null){
 		response.sendRedirect("index.jsp");
@@ -7,7 +15,7 @@
 
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root");
-	PreparedStatement st = con.prepareStatement("select program_link from activity where id=?");
+	PreparedStatement st = con.prepareStatement("select activity_id_1, activity_id_2, story_scene_id from game where id=?");
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
 	if(rs.next()==false){

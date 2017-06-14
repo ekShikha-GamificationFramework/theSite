@@ -24,6 +24,7 @@
 <script type="text/javascript">
 	var activities=[];
 	var scenes=[];
+	var path = [];
 	var gameMapData = {
 		"nodes": [],
 		"edges": []
@@ -66,7 +67,7 @@
 	    </button>
 	    
 	    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
-	    <input class="form-control" type="text" placeholder="Activity Link" id="sceneMedia"/>
+	    <input class="form-control" type="text" placeholder="Scene Link" id="sceneMedia"/>
 		<button class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
 	        Add scene
 	    </button>
@@ -105,7 +106,8 @@
 	    </button>
 	    <br>
 	    <input class="form-control" type="text" id="gameName" placeholder="Name your Game!"/>
-	    <button class="btn btn-default" onclick="activityUploader(); sceneUploader();" style="margin-top:10px; margin-bottom:10px">
+	    <input class="form-control" type="text" id="gameLink" placeholder="Provide Icon Link"/>
+	    <button class="btn btn-default" onclick="gameUploader();" style="margin-top:10px; margin-bottom:10px">
 	        Create Game
 	    </button>
     </div>
@@ -137,9 +139,20 @@ rs.next();
 	newSceneID = parseInt(newSceneID);
 </script>
 
+<%
+
+st=con.prepareStatement("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'game' AND table_schema = DATABASE()");
+rs=st.executeQuery();
+rs.next();
+
+%>
+
 <script type="text/javascript">
 	//add this to script.js
 	//or maybe not
+
+	var curGameID = <%= rs.getInt(1) %>;
+
     function activityAdder(){
     	
     	var c = document.getElementById("theName").value;
@@ -156,8 +169,7 @@ rs.next();
     	var a = document.createElement("option");
     	var b = document.createElement("option");
 
-
-    	a.text=b.text=c
+    	a.text=b.text=c;
     	a.value=b.value=newActivityID;
 
     	document.getElementById("sel1").appendChild(a);
@@ -168,6 +180,17 @@ rs.next();
     		"name" : c
     	});
 
+    	activities.push({
+			"name" : c,
+			"icon_link" : f,
+			"program_link" : g, 
+			"class" : d,
+			"max_score" : e,
+			"topic_id" : document.getElementById("theTopics").value,
+			"creation_date" : new Date().toJSON().slice(0,10),
+			"id" : newActivityID
+		});
+
     	newActivityID++;
     	var myNode = document.getElementById("alchemy");
 		while (myNode.firstChild) {
@@ -175,16 +198,6 @@ rs.next();
 		}
 
 		alchemy = new Alchemy(config);
-
-		activities.push({
-			"name" : c,
-			"icon_link" : f,
-			"program_link" : g, 
-			"class" : d,
-			"max_score" : e,
-			"topic_id" : document.getElementById("theTopics").value,
-			"creation_date" : new Date().toJSON().slice(0,10)
-		});
 
 		document.getElementById("theName").value="";
     	document.getElementById("theClass").value="";
@@ -204,11 +217,11 @@ rs.next();
     	a.value=newSceneID;
     	a.text=c;
     	document.getElementById("sel3").appendChild(a);
+
+    	scenes.push({"name" : c, "link": b, "id" : newSceneID});
    
     	newSceneID++;
 
-    	scenes.push({"name" : c, "link": b});
-    	
     	document.getElementById("sceneMedia").value="";
     	document.getElementById("sceneName").value="";
     }
@@ -233,6 +246,12 @@ rs.next();
 			}
 
 			alchemy = new Alchemy(config);
+
+			path.push({
+				"act1" : parseInt(act1),
+				"act2" : parseInt(act2),
+				"scene" : parseInt(document.getElementById('sel3').selectedOptions[0].value)
+			});
     	}    	
     }
 
@@ -247,6 +266,11 @@ rs.next();
 				"topic_id" : obj.topic_id,
 				"creation_date" : obj.creation_date
 			});
+
+			sendInfo("gameactivity", "i", {
+				"game_id" : curGameID,
+				"activity_id" : obj.id
+			});
     	}
     	activities=[];
     }
@@ -256,6 +280,37 @@ rs.next();
     		sendInfo("story_scene", "i", {"name" : obj.name, "link": obj.link});
     	}
     	scenes=[];
+    }
+
+    function pathUploader(){
+    	for(obj of path){
+    		sendInfo("path", "i", {
+    			"activity_id_1" : obj.act1,
+    			"activity_id_2" : obj.act2,
+    			"story_scene_id" : obj.scene,
+    			"game_id" : curGameID
+    		});
+    	}
+    	path=[];
+    }
+
+    function gameUploader(){
+    	if(document.getElementById("gameName").value=="" || document.getElementById("gameName").value==""){
+    		alert("Don't leave anything empty!");
+    		return;
+    	}
+    	sendInfo("game", "i", {
+    		"name" : document.getElementById("gameName").value,
+    		"icon_link": document.getElementById("gameLink").value,
+    		"teacher_id" : "<%out.print(session.getAttribute("id"));%>",
+    		"creation_date" : new Date().toJSON().slice(0,10)  
+    	});
+
+    	activityUploader();
+    	sceneUploader();
+    	pathUploader();
+
+    	curGameID++;
     }
 
 	var request;  
