@@ -5,6 +5,7 @@
 <script src="../public/js/d3.v3.min.js"></script>
 <script src="../public/js/alchemy.js"></script>
 <script src="../public/js/vendor.js"></script>
+<script src="../public/js/scripts.js"></script>
 
 <div class="alchemy" id="alchemy" style="height:70vh; width:80vw"></div>
 
@@ -34,7 +35,12 @@
 	var config = {
 		dataSource: gameMapData,
 		forceLocked: false,     
-		linkDistance: function(){ return 20; },
+		linkDistance: function(){ return 25; },
+		nodeStyle : {
+			"all" : {
+				"radius" :20
+			}
+		},
 		nodeCaption: function(node){ 
 			return node.name;
 		}
@@ -299,6 +305,16 @@ rs.next();
     		alert("Don't leave anything empty!");
     		return;
     	}
+    	
+    	if(gameMapData.nodes.length==0){
+    		alert("Please select some activities!")
+    		return;
+    	}
+
+    	activityUploader();
+    	sceneUploader();
+    	pathUploader();
+
     	sendInfo("game", "i", {
     		"name" : document.getElementById("gameName").value,
     		"icon_link": document.getElementById("gameLink").value,
@@ -306,44 +322,7 @@ rs.next();
     		"creation_date" : new Date().toJSON().slice(0,10)  
     	});
 
-    	activityUploader();
-    	sceneUploader();
-    	pathUploader();
-
     	curGameID++;
     }
-
-	var request;  
-
-	//dict has all the table row values
-	//type - select/insert/update -> s,i,u
-	function sendInfo(table, type, dict){  
-		var url="../includes/ajaxHandler.jsp?table="+table+"&type="+type;  
-		var keys = Object.keys(dict);
-
-		for(a of keys){
-			url=url+"&"+a+"="+dict[a];
-		}
-
-		if(window.XMLHttpRequest){  
-			request=new XMLHttpRequest();  
-		}  
-		else if(window.ActiveXObject){  
-			request=new ActiveXObject("Microsoft.XMLHTTP");  
-		}  
-
-		try{  
-			if(type=="s")	request.onreadystatechange=getInfo;  
-			request.open("GET", url, true);  
-			request.send();  
-		}
-		catch(e){
-			alert("Unable to connect to server");
-		}  
-	}  
-
-	function getInfo(){
-		
-	}
 
 </script>

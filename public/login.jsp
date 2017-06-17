@@ -40,7 +40,8 @@
 			try{
 				Class.forName("com.mysql.jdbc.Driver"); 
 				java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root"); 
-				PreparedStatement st = con.prepareStatement("select * from teacher where id = ?");
+
+				PreparedStatement st = con.prepareStatement("select * from "+request.getParameter("type")+" where id = ?");
 				st.setString(1, request.getParameter("username"));
 				ResultSet rs=st.executeQuery();
 
@@ -48,29 +49,29 @@
 					if(((String)request.getParameter("password")).equals(rs.getString(5))){
 						session.setAttribute("id", request.getParameter("username"));
 						session.setAttribute("type", request.getParameter("type"));
-						response.sendRedirect("/gamification-Site/public/index.jsp");
+						response.sendRedirect("index.jsp");
 					}
 					else{
 					%>
-					<jsp:include page = "../views/header.jsp" flush = "true">
-						<jsp:param name="title" value="Login" />
-					</jsp:include>
-					<jsp:include page = "../views/apology.jsp" flush = "true" >
-						<jsp:param name="message" value="Wrong Password!" />
-					</jsp:include>	
-					<jsp:include page = "../views/footer.jsp" flush = "true" />
+						<jsp:include page = "../views/header.jsp" flush = "true">
+							<jsp:param name="title" value="Login" />
+						</jsp:include>
+						<jsp:include page = "../views/apology.jsp" flush = "true" >
+							<jsp:param name="message" value="This username is not in our records!" />
+						</jsp:include>	
+						<jsp:include page = "../views/footer.jsp" flush = "true" />
 					<%
 					}
 				} 
 				else{
 					%>
-					<jsp:include page = "../views/header.jsp" flush = "true">
-						<jsp:param name="title" value="Login" />
-					</jsp:include>
-					<jsp:include page = "../views/apology.jsp" flush = "true" >
-						<jsp:param name="message" value="Wrong Username!" />
-					</jsp:include>	
-					<jsp:include page = "../views/footer.jsp" flush = "true" />
+						<jsp:include page = "../views/header.jsp" flush = "true">
+							<jsp:param name="title" value="Login" />
+						</jsp:include>
+						<jsp:include page = "../views/apology.jsp" flush = "true" >
+							<jsp:param name="message" value="Wrong Username!" />
+						</jsp:include>	
+						<jsp:include page = "../views/footer.jsp" flush = "true" />
 					<%
 				}
 				con.close();

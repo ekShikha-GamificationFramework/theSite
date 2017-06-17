@@ -15,8 +15,6 @@
 		<jsp:include page = "../views/footer.jsp" flush = "true" /> 
 	<%}
 	else{
-		
-
 		if(request.getParameter("username").isEmpty() || request.getParameter("password").isEmpty() || request.getParameter("email").isEmpty() || request.getParameter("school").isEmpty() ){%>
 			<jsp:include page = "../views/header.jsp" flush = "true">
 				<jsp:param name="title" value="Login" />
@@ -53,7 +51,7 @@
 				con.close();
 				session.setAttribute("id", request.getParameter("username"));
 
-				response.sendRedirect("/gamification-Site/public/index.jsp");
+				response.sendRedirect("index.jsp");
 
 				
 			}

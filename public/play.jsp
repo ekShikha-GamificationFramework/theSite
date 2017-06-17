@@ -1,21 +1,41 @@
 <%@ page import="java.sql.*" %>
 <link rel="stylesheet" href="../public/css/styles.css"/>
+<script type="text/javascript" src="js/scripts.js"></script>
+
+<!-- ADD THE TAXONOMY STUFF -->
 
 <script type="text/javascript">
+
 	var fetchedGameMapData = {
 		"nodes": [],
 		"edges": []
 	};
 
+	var links = {};
+
 	var config = {
 		dataSource: fetchedGameMapData,
-		forceLocked: false,     
-		linkDistance: function(){ return 20; },
+		forceLocked: true,     
+		linkDistance: function(){ return 25; },
+		nodeStyle : {
+			"all" : {
+				"radius" :20
+			}
+		},
+		nodeClick : function(){
+			if(window.clickedNode){
+				document.getElementById('alchemy').style.display="none";
+				var obj = document.getElementById('activitySpace');
+				obj.style.display="block";
+				obj.src = links[window.clickedNode];
+			}
+		},
 		nodeCaption: function(node){ 
 			return node.name;
 		}
 	};
 	
+
 </script>
 
 <link rel="stylesheet" href="../public/css/alchemy.min.css"/>
@@ -23,6 +43,7 @@
 <script src="../public/js/d3.v3.min.js"></script>
 <script src="../public/js/alchemy.js"></script>
 <script src="../public/js/vendor.js"></script>
+<script src="../public/js/scripts.js"></script>
 
 <%
 	if(request.getParameter("id")==null){
@@ -31,7 +52,7 @@
 
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root");
-	PreparedStatement st = con.prepareStatement("select activity_id, activity.name from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
+	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
 	if(rs.next()==false){
@@ -46,7 +67,8 @@
 	<%
 	}
 	else{%>
-	<div class="alchemy" id="alchemy" style="height:70vh; width:80vw"></div>
+	<iframe id="activitySpace" type="text/html" style="background: #000000;height:95vh; width:80vw; margin-left:19vw;"></iframe>
+	<div class="alchemy" id="alchemy"></div>
 	<script type="text/javascript"><%
 		Boolean f = true;
 		while(f){%>
@@ -54,6 +76,7 @@
 				"id" : "<%out.print(rs.getInt(1));%>",
 				"name" : "<%out.print(rs.getString(2));%>"
 			});
+			links[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(3));%>";
 			<%
 			f=rs.next();
 		}
@@ -67,6 +90,40 @@
 				"caption" : "<%out.print(rs.getString(3));%>"
 			});
 			var alchemy = new Alchemy(config);
+			var alchemyDiv = document.getElementById('alchemy');
+			alchemyDiv.style.width = "80vw";
+			alchemyDiv.style.height = "95vh";
+			alchemyDiv.style.marginLeft = "19vw";
+			document.getElementById('activitySpace').style.display="none";
+
+			window.addEventListener('message', function(evt) {
+				if(confirm("Game over! You scored "+evt.data+"!\nPlay again?")){
+					var actSpace = document.getElementById('activitySpace');
+					//refresh
+					actSpace.src = actSpace.src;
+				}		
+				else{
+					showMap();
+					var userID = "<%out.print(session.getAttribute("id"));%>";
+					var userType = "<%out.print(session.getAttribute("type"));%>";
+
+					//save only when a student is playing
+					if(userID!="null" && userType=="Student"){
+						<%
+							
+						%>
+						// sendInfo("stats", "i", {
+						// 	"student_id" : userID,
+
+						// });
+					}
+				}
+			});        
+
+			function showMap(){
+				document.getElementById('activitySpace').style.display='none'; 
+				document.getElementById('alchemy').style.display='block';
+			}
 		<%}
 	}
 	%>
@@ -74,5 +131,5 @@
 %>
 
 <div class="sidenav">
-
+	<button onclick="showMap()">Map</button>
 </div>

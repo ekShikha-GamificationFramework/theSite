@@ -1,9 +1,13 @@
-create database iitb;
-use iitb;
+-- create database iitb;
+-- use iitb;
+
+create database gamification;
+use gamification;
 
 create table student (
 	id varchar(30) primary key, 
 	name varchar(256) not null,
+	level varchar(20),
 	email varchar(256) not null,
 	school_id int(10) unsigned,
 	class int(3),
@@ -29,6 +33,7 @@ create table school(
 create table activity (
 	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null,
+	level varchar(20),
 	icon_link varchar(256),
 	program_link varchar(256) not null,
 	class int(3) not null,
@@ -57,7 +62,7 @@ create table topic(
 ) auto_increment=0;
 
 create table stats(
-	student_id int(10) not null,
+	student_id varchar(256) primary key,
 	pair_id int(10) not null,
 	score int not null default 0,
 	last_played date not null

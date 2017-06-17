@@ -1059,6 +1059,9 @@
             }
             return "selected";
           })();
+
+          window.clickedNode = node.id;			//added this to get the node clicked
+
           return node.setStyles();
         }
       },
