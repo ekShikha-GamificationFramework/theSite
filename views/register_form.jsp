@@ -9,25 +9,24 @@
         </div>
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"/>
+            <span><b>Credentials</b></span>
+            <input class="form-control" name="password" placeholder="Password" type="password"/>
         </div>
         <div class="form-group">
             <input class="form-control" name="name" placeholder="Name" type="text"/>
         </div>
         <div class="form-group">
-            <input class="form-control" name="password" placeholder="Password" type="password"/>
-        </div>
-        <div class="form-group">
             <input class="form-control" name="email" placeholder="E-mail" type="email"/>
         </div>
         <div class="form-group">
-            <input class="form-control" name="school" placeholder="School" type="text"/>
+            <input class="form-control" name="school" placeholder="School" type="text" onchange="searchSchool()" />
         </div>
         <div class="form-group" id="theClassDiv" style="display: none;">
-	        <select class="form-control" id="theClassSel">
+	        <select class="form-control" id="theClassSel" name="class">
 	        	<%
 	        		int i=1;
 	        		for(i=1; i<=12; i++){
-	        			out.println("<option value="+i+">Class "+i+"</option>");
+	        			out.print("<option value="+i+">Class "+i+"</option>");
 	        		}
 	        	%>
 	        </select>
@@ -43,3 +42,10 @@
         </div>
     </fieldset>
 </form>
+
+<script type="text/javascript" src="js/scripts.js"></script>
+<script type="text/javascript">
+    function searchSchool(){
+        console.log(this);
+    }
+</script>

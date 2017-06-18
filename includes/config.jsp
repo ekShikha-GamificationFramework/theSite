@@ -1,7 +1,7 @@
 <%@include file="helpers.jsp"%>
 
 <%
-	out.print(getCon("iitb", "root", "root"));
+	out.print(getCon());
 	// String uri = request.getRequestURI();
 	// String name = uri.substring(uri.lastIndexOf("/")+1);
 	

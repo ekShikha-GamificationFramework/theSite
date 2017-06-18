@@ -62,7 +62,14 @@ function sendInfo(table, type, dict){
 	var keys = Object.keys(dict);
 
 	for(a of keys){
-		url=url+"&"+a+"="+dict[a];
+		if(dict[a].constructor===Array){
+			for(x of dict[a]){
+				url=url+"&"+a+"="+ x;
+			}
+		}
+		else{
+			url=url+"&"+a+"="+dict[a];
+		}
 	}
 
 	if(window.XMLHttpRequest){  
@@ -84,6 +91,6 @@ function sendInfo(table, type, dict){
 
 function getInfo(){
 	if(request.readyState==4){   
-		console.log(request.responseText);  
+		console.log(JSON.parse(request.responseText));  
 	}  
 }

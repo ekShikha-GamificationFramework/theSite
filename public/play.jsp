@@ -121,7 +121,8 @@
 			});        
 
 			function showMap(){
-				document.getElementById('activitySpace').style.display='none'; 
+				document.getElementById('activitySpace').style.display='none';
+				document.getElementById('activitySpace').src=""; 
 				document.getElementById('alchemy').style.display='block';
 			}
 		<%}

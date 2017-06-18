@@ -61,11 +61,17 @@ else if(request.getParameter("type").equals("s")){
 
 	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
 	ResultSet rs = st.executeQuery();
+
+	//send JSON
+	s1="[";
+	String[] sel = request.getParameterValues("selections");
 	while(rs.next()){
+		s1+="{";
 		for(int i = 1; i <= columns; i++){
-			out.print(rs.getString(i) +" ");
+			s1=s1+"\""+sel[i-1]+"\""+":"+"\""+rs.getString(i)+"\"" +",";
 		}
-		out.print("<br>");	
+		s1=s1.substring(0, s1.length()-1)+"},";
 	}
+	out.print(s1.substring(0, s1.length()-1)+"]");
 }
 %>
