@@ -39,9 +39,15 @@
 		else {
 			try{
 				Class.forName("com.mysql.jdbc.Driver"); 
-				java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root"); 
-
-				PreparedStatement st = con.prepareStatement("select * from "+request.getParameter("type")+" where id = ?");
+				java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123"); 
+				String s;
+				if(request.getParameter("type").equals("t")){
+					s="teacher";
+				}
+				else{
+					s="student";
+				}
+				PreparedStatement st = con.prepareStatement("select * from "+s+" where id = ?");
 				st.setString(1, request.getParameter("username"));
 				ResultSet rs=st.executeQuery();
 

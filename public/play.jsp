@@ -34,7 +34,6 @@
 			return node.name;
 		}
 	};
-	
 
 </script>
 
@@ -51,7 +50,7 @@
 	}
 
 	Class.forName("com.mysql.jdbc.Driver"); 
-	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root");
+	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
 	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
@@ -69,6 +68,9 @@
 	else{%>
 	<iframe id="activitySpace" type="text/html" style="background: #000000;height:95vh; width:80vw; margin-left:19vw;"></iframe>
 	<div class="alchemy" id="alchemy"></div>
+	<div class="sidenav">
+		<button class="btn btn-default" onclick="showMap()">Map</button>
+	</div>
 	<script type="text/javascript"><%
 		Boolean f = true;
 		while(f){%>
@@ -89,48 +91,45 @@
 				"target" : "<%out.print(rs.getInt(2));%>",
 				"caption" : "<%out.print(rs.getString(3));%>"
 			});
-			var alchemy = new Alchemy(config);
-			var alchemyDiv = document.getElementById('alchemy');
-			alchemyDiv.style.width = "80vw";
-			alchemyDiv.style.height = "95vh";
-			alchemyDiv.style.marginLeft = "19vw";
-			document.getElementById('activitySpace').style.display="none";
+		<%}%>
+		var alchemy = new Alchemy(config);
+		var alchemyDiv = document.getElementById('alchemy');
+		alchemyDiv.style.width = "80vw";
+		alchemyDiv.style.height = "95vh";
+		alchemyDiv.style.marginLeft = "19vw";
+		document.getElementById('activitySpace').style.display="none";
 
-			window.addEventListener('message', function(evt) {
-				if(confirm("Game over! You scored "+evt.data+"!\nPlay again?")){
-					var actSpace = document.getElementById('activitySpace');
-					//refresh
-					actSpace.src = actSpace.src;
-				}		
-				else{
-					showMap();
-					var userID = "<%out.print(session.getAttribute("id"));%>";
-					var userType = "<%out.print(session.getAttribute("type"));%>";
+		window.addEventListener('message', function(evt) {
+			if(confirm("Game over! You scored "+evt.data+"!\nPlay again?")){
+				var actSpace = document.getElementById('activitySpace');
+				//refresh
+				actSpace.src = actSpace.src;
+			}		
+			else{
+				showMap();
+				var userID = "<%out.print(session.getAttribute("id"));%>";
+				var userType = "<%out.print(session.getAttribute("type"));%>";
 
-					//save only when a student is playing
-					if(userID!="null" && userType=="Student"){
-						<%
-							
-						%>
-						// sendInfo("stats", "i", {
-						// 	"student_id" : userID,
+				//save only when a student is playing
+				if(userID!="null" && userType=="s"){
+					<%
+						
+					%>
+					// sendInfo("stats", "i", {
+					// 	"student_id" : userID,
 
-						// });
-					}
+					// });
 				}
-			});        
-
-			function showMap(){
-				document.getElementById('activitySpace').style.display='none';
-				document.getElementById('activitySpace').src=""; 
-				document.getElementById('alchemy').style.display='block';
 			}
-		<%}
-	}
+		});
+		function showMap(){
+			document.getElementById('activitySpace').style.display='none';
+			document.getElementById('activitySpace').src=""; 
+			document.getElementById('alchemy').style.display='block';
+		}
+		</script>
+	<%}
 	%>
-	</script>
-%>
 
-<div class="sidenav">
-	<button onclick="showMap()">Map</button>
-</div>
+	
+

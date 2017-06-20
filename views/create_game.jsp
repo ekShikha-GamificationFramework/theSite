@@ -12,7 +12,7 @@
 <%
 	// ---------------->>>>>>>>>>>>> USE AJAX HERE !!!!!!!!  <<<<<<<<<<<<<<<-----------------
 	Class.forName("com.mysql.jdbc.Driver"); 
-	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root");
+	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
 	PreparedStatement st = con.prepareStatement("select id, name from activity");
 	ResultSet rs=st.executeQuery();
 	String s="";
@@ -53,71 +53,85 @@
 
 <div class="sidenav">
 	<div class="form-group">
-		<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
-		<input class="form-control" type="text" id="theClass" placeholder="Class"/>
-		<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
-		<input class="form-control" type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
-		<input class="form-control" type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
-		<select class="form-control" id="theTopics">
-		<%
-			st=con.prepareStatement("select * from topic");
-			rs=st.executeQuery();
-			while(rs.next()){
-				out.println("<option value="+ rs.getInt(1)+">"+ rs.getString(2) +"</option>");
-			}	
-		%>
-		</select>
-		<br>
-		<button class="btn btn-default" onclick="activityAdder()" style="margin-top:10px; margin-bottom:10px">
-	        Add activity
-	    </button>
-	    
-	    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
-	    <input class="form-control" type="text" placeholder="Scene Link" id="sceneMedia"/>
-		<button class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
-	        Add scene
-	    </button>
-	    <br/>
-	   
+		<div id = "actChoose" class="gamifyDiv">
+			<button class="btn btn-default" >Create new activity</button><br>or<br><a href="#">Choose from existing ones</a>
+		</div>
+		<div id="newActivityDiv" class="gamifyDiv">
+			<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
+			<input class="form-control" type="text" id="theClass" placeholder="Class"/>
+			<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
+			<input class="form-control" type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
+			<input class="form-control" type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
+			<input class="form-control" id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"/>
+			<button class="btn btn-default" onclick="activityAdder()" style="margin-top:10px; margin-bottom:10px">
+	        	Add activity
+	    	</button>
+		</div>
 
-		<span style="color:white">Activity #1</span>
-	    <select class="form-control" id="sel1">
-	    	<% out.println(s); %>
-	    </select>
+		<div id="existingActivityDiv" class="gamifyDiv">
+			<select class="form-control" id="actSelect"><%out.print(s);%></select>
+		</div>
+		
+		<div id="sceneDiv" class="gamifyDiv">	    
+		    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
+		    <input class="form-control" type="text" placeholder="Scene Link" id="sceneMedia"/>
+			<button class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
+		        Add scene
+		    </button>
+	    </div>
 
-	    <br>
-	    
-	    <span style="color:white">Activity #2</span>
-	    <select class="form-control" id="sel2">
-	    	<% out.println(s); %>
-	    </select>
-	    
-	    <br>
-	    
-	    <span style="color:white">Connecting Scene</span>
-	    <select id="sel3" class="form-control">
-	    	<%
-	    	st=con.prepareStatement("select id, name from story_scene");
-	    	rs=st.executeQuery();
-	    	while(rs.next()){
-	    		out.println("<option value="+rs.getInt(1)+">"+rs.getString(2)+"</option>");
-	    	}
-	    	%>
-	    </select>
+	    <div id="pathDiv" class="gamifyDiv">	
+			<span style="color:white">Activity #1</span>
+		    <select class="form-control" id="sel1">
+		    	<% out.println(s); %>
+		    </select>
 
-	    <br>
+		    <br>
+		    
+		    <span style="color:white">Activity #2</span>
+		    <select class="form-control" id="sel2">
+		    	<% out.println(s); %>
+		    </select>
+		    
+		    <br>
+		    
+		    <span style="color:white">Connecting Scene</span>
+		    <select id="sel3" class="form-control">
+		    	<%
+		    	st=con.prepareStatement("select id, name from story_scene");
+		    	rs=st.executeQuery();
+		    	while(rs.next()){
+		    		out.println("<option value="+rs.getInt(1)+">"+rs.getString(2)+"</option>");
+		    	}
+		    	%>
+		    </select>
 	    
-	    <button class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
-	        Connect
-	    </button>
-	    <br>
-	    <input class="form-control" type="text" id="gameName" placeholder="Name your Game!"/>
-	    <input class="form-control" type="text" id="gameLink" placeholder="Provide Icon Link"/>
-	    <button class="btn btn-default" onclick="gameUploader();" style="margin-top:10px; margin-bottom:10px">
-	        Create Game
-	    </button>
+		    <button class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
+		        Connect
+		    </button>
+	    </div>
+	    <div id="gameDiv" class="gamifyDiv">
+		    <input class="form-control" type="text" id="gameName" placeholder="Name your Game!"/>
+		    <input class="form-control" type="text" id="gameLink" placeholder="Provide Icon Link"/>
+		    <button class="btn btn-default" onclick="gameUploader();" style="margin-top:10px; margin-bottom:10px">
+		        Create Game
+		    </button>
+		</div>
     </div>
 </div>
+<datalist id="topics"></datalist>
+
+<%
+
+st=con.prepareStatement("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'topic' AND table_schema = DATABASE()");
+rs=st.executeQuery();
+rs.next();
+
+%>
+
+<script type="text/javascript">
+	var theTopicID = parseInt("<%out.print(rs.getInt(1));%>")-1;
+</script>
 
 <%
 
@@ -167,7 +181,7 @@ rs.next();
     	var f = document.getElementById("theIcon").value;
     	var g = document.getElementById("theLink").value;
 
-    	if(c=="" || d=="" || e=="" || f=="" || g==""){
+    	if(c=="" || d=="" || e=="" || g==""){
     		alert("Don't leave it empty!");
     		return;
     	}
@@ -186,13 +200,20 @@ rs.next();
     		"name" : c
     	});
 
+    	sendInfo("topic", "s", getTopicID, {
+    		"selections" : ["id"],
+    		"lhs" : ["name"],
+    		"operator" : ["="],
+    		"rhs" : [document.getElementById("theTopics").value] 
+    	});
+
     	activities.push({
 			"name" : c,
 			"icon_link" : f,
 			"program_link" : g, 
 			"class" : d,
 			"max_score" : e,
-			"topic_id" : document.getElementById("theTopics").value,
+			"topic_id" : theTopicID,
 			"creation_date" : new Date().toJSON().slice(0,10),
 			"id" : newActivityID
 		});
@@ -263,7 +284,7 @@ rs.next();
 
     function activityUploader(){
     	for(obj of activities){
-    		sendInfo("activity", "i", {
+    		sendInfo("activity", "i", null, {
 				"name" : obj.name,
 				"icon_link" : obj.icon_link,
 				"program_link" : obj.program_link, 
@@ -273,7 +294,7 @@ rs.next();
 				"creation_date" : obj.creation_date
 			});
 
-			sendInfo("gameactivity", "i", {
+			sendInfo("gameactivity", "i", null, {
 				"game_id" : curGameID,
 				"activity_id" : obj.id
 			});
@@ -315,7 +336,7 @@ rs.next();
     	sceneUploader();
     	pathUploader();
 
-    	sendInfo("game", "i", {
+    	sendInfo("game", "i", null, {
     		"name" : document.getElementById("gameName").value,
     		"icon_link": document.getElementById("gameLink").value,
     		"teacher_id" : "<%out.print(session.getAttribute("id"));%>",
@@ -325,4 +346,43 @@ rs.next();
     	curGameID++;
     }
 
+</script>
+
+<script type="text/javascript">
+    function searchTopic(){
+    	var text = document.getElementById('theTopics').value;
+    	sendInfo("topic", "s", putTopic, {
+    		"selections" : ["name", "id"],
+    		"lhs" : ["name"],
+    		"operator" : ["like"],
+    		"rhs" : ["%25"+text+"%25"]
+    	});
+    }
+    function putTopic(){
+    	if(request.readyState==4 && request.status == 200){ 
+			var obj = JSON.parse(request.responseText); 
+			var s = ""; 
+			for(a of obj){
+				s+="<option value= \""+ a.name +"\">" + a.id+"</option>";
+			}
+			document.getElementById("topics").innerHTML=s;
+		} 
+    }
+    function getTopicID(){
+    	if(request.readyState==4 && request.status == 200){
+    		var obj = JSON.parse(request.responseText);
+    		if(obj.length==0){
+    			setTopicID();
+    		} 
+			else{
+				theTopicID = parseInt(obj[0].id);
+			}
+    	}
+    }
+    function setTopicID(){
+    	sendInfo("topic", "i", null, {
+    		"name" : document.getElementById("theTopics").value
+    	});
+    	theTopicID++;
+    }
 </script>

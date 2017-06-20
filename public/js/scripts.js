@@ -57,7 +57,7 @@ var request;
 
 //dict has all the table row values
 //type - select/insert/update -> s,i,u
-function sendInfo(table, type, dict){  
+function sendInfo(table, type, func, dict){  
 	var url="../includes/ajaxHandler.jsp?table="+table+"&type="+type;  
 	var keys = Object.keys(dict);
 
@@ -71,7 +71,6 @@ function sendInfo(table, type, dict){
 			url=url+"&"+a+"="+dict[a];
 		}
 	}
-
 	if(window.XMLHttpRequest){  
 		request=new XMLHttpRequest();  
 	}  
@@ -80,7 +79,9 @@ function sendInfo(table, type, dict){
 	}  
 
 	try{  
-		if(type=="s")	request.onreadystatechange=getInfo;  
+		if(type=="s"){
+			request.onreadystatechange=func;  
+		}
 		request.open("GET", url, true);  
 		request.send();  
 	}
@@ -88,9 +89,3 @@ function sendInfo(table, type, dict){
 		alert("Unable to connect to server");
 	}  
 }  
-
-function getInfo(){
-	if(request.readyState==4){   
-		console.log(JSON.parse(request.responseText));  
-	}  
-}

@@ -3,8 +3,8 @@
    		<div class="form-group">
             <label for="usertype">Log In as:</label>
             <select class="form-control" name="type" id="usertype">
-                <option>Teacher</option>
-	            <option>Student</option>
+                <option value="t">Teacher</option>
+	            <option value="s">Student</option>
             </select>
         </div>
         <div class="form-group">

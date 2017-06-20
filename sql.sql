@@ -7,12 +7,12 @@ use gamification;
 create table student (
 	id varchar(30) primary key, 
 	name varchar(256) not null,
-	level varchar(20),
 	email varchar(256) not null,
 	school_id int(10) unsigned,
 	class int(3),
 	dob date not null,
-	password_hash varchar(256) not null
+	password_hash varchar(256) not null,
+	level varchar(20)
 ) auto_increment=0;
 
 create table teacher (
@@ -26,20 +26,20 @@ create table teacher (
 create table school(
 	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null,
-	city varchar(256) not null,
-	state varchar(256) not null
+	city varchar(50) not null,
+	state varchar(50) not null
 ) auto_increment=0;
 
 create table activity (
 	id int(10) unsigned auto_increment primary key,
 	name varchar(256) not null,
-	level varchar(20),
 	icon_link varchar(256),
 	program_link varchar(256) not null,
 	class int(3) not null,
 	max_score int not null,
 	topic_id int(10) not null,
-	creation_date date not null 
+	creation_date date not null ,
+	level varchar(20)
 ) auto_increment=0;
 
 create table game(
@@ -62,7 +62,7 @@ create table topic(
 ) auto_increment=0;
 
 create table stats(
-	student_id varchar(256) primary key,
+	student_id varchar(30) primary key,
 	pair_id int(10) not null,
 	score int not null default 0,
 	last_played date not null
@@ -71,11 +71,12 @@ create table stats(
 create table path (
 	activity_id_1 int(10) not null,
 	activity_id_2 int(10) not null,
-	story_scene_id int(10) not null
+	story_scene_id int(10) not null,
+	score int(5)
 );
 
 create table story_scene(
 	id int(10) unsigned auto_increment primary key,
-	name varchar(256) not null,
+	name varchar(50) not null,
 	link varchar(256)
 ) auto_increment=0;

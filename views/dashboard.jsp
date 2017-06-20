@@ -4,7 +4,7 @@
 <%
 	try{
 		Class.forName("com.mysql.jdbc.Driver"); 
-		java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root"); 
+		java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123"); 
 	
 		PreparedStatement st = con.prepareStatement("select * from game");
 		ResultSet rs=st.executeQuery();

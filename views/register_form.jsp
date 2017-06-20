@@ -19,7 +19,9 @@
             <input class="form-control" name="email" placeholder="E-mail" type="email"/>
         </div>
         <div class="form-group">
-            <input class="form-control" name="school" placeholder="School" type="text" onchange="searchSchool()" />
+            <input class="form-control" list="schools" name="school" id="school" placeholder="School" type="text" onchange="searchSchool()" /><br>
+            <input class="form-control" name="schoolcity" placeholder="School City" type="text"/><br>
+            <input class="form-control" name="schoolstate" placeholder="School State" type="text"/>
         </div>
         <div class="form-group" id="theClassDiv" style="display: none;">
 	        <select class="form-control" id="theClassSel" name="class">
@@ -43,9 +45,29 @@
     </fieldset>
 </form>
 
+<datalist id="schools">
+	
+</datalist>
+
 <script type="text/javascript" src="js/scripts.js"></script>
 <script type="text/javascript">
     function searchSchool(){
-        console.log(this);
+    	var text = document.getElementById('school').value;
+    	sendInfo("school", "s", putSchool, {
+    		"selections" : ["name", "city"],
+    		"lhs" : ["name"],
+    		"operator" : ["like"],
+    		"rhs" : ["%25"+text+"%25"]
+    	});
+    }
+    function putSchool(){
+    	if(request.readyState==4 && request.status == 200){ 
+			var obj = JSON.parse(request.responseText); 
+			var s = ""; 
+			for(a of obj){
+				s+="<option value= \""+ a.name +"\">" + a.city+"</options>";
+			}
+			document.getElementById("schools").innerHTML=s;
+		} 
     }
 </script>

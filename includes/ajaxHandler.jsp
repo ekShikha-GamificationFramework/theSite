@@ -7,7 +7,7 @@ String s1, s2;
 Map<String, String[]> parameters;
 
 Class.forName("com.mysql.jdbc.Driver"); 
-java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/iitb","root","root");
+java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
 PreparedStatement st;
 
 // insert
@@ -35,27 +35,25 @@ if(request.getParameter("type").equals("i")){
 	con.close();
 }
 else if(request.getParameter("type").equals("s")){
-	int columns = 0;
-
+	String[] sel = request.getParameterValues("selections");
+	int columns = sel.length;
 	s1 = "select ";
-	for(String selection : request.getParameterValues("selections")){
-		s1 = s1 + selection+",";
-		columns++;
+	for(int i = 0; i < columns; i++){
+		s1 = s1 + sel[i]+",";
 	}
 	s2 = " from " + request.getParameter("table") + " where ";
 	
-	parameters = request.getParameterMap();
-	for(String parameter : parameters.keySet()) {
-		if(parameter.equals("type") || parameter.equals("table") || parameter.equals("selections")){
-			continue;
-		}
-		s2=s2 + parameter + "=";
+	String[] lhs = request.getParameterValues("lhs");
+	String[] operator = request.getParameterValues("operator");
+	String[] rhs = request.getParameterValues("rhs");
+	int conditions = lhs.length;
+
+	for(int i=0; i<conditions; i++){
 		try{  
-			int a = Integer.parseInt(parameters.get(parameter)[0]);  
-			s2=s2 + a + " and ";
+			s2 = s2 + lhs[i] + " " + operator[i] + " " + Integer.parseInt(rhs[i]) + " and ";
 		}  
 		catch(NumberFormatException nfe){  
-			s2=s2 + "\""+parameters.get(parameter)[0]+"\"" + " and ";
+			s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
 		}  
 	}
 
@@ -64,7 +62,6 @@ else if(request.getParameter("type").equals("s")){
 
 	//send JSON
 	s1="[";
-	String[] sel = request.getParameterValues("selections");
 	while(rs.next()){
 		s1+="{";
 		for(int i = 1; i <= columns; i++){
@@ -72,6 +69,13 @@ else if(request.getParameter("type").equals("s")){
 		}
 		s1=s1.substring(0, s1.length()-1)+"},";
 	}
-	out.print(s1.substring(0, s1.length()-1)+"]");
+	s1=s1.substring(0, s1.length()-1);
+	if(s1.isEmpty()){
+		out.print("[]");
+	}
+	else{
+		out.print(s1+"]");
+	}
+	con.close();
 }
 %>

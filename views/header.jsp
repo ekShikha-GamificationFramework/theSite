@@ -22,11 +22,11 @@
                 <div>
                     <a href="../public/index.jsp"><img alt="Gamification" src="../public/img/logo.png"/></a>
                 </div>
-                <% if (session.getAttribute("id")!=null){ %>
+                <% if (session.getAttribute("id")!=null && session.getAttribute("type")!=null){ %>
 	                
                     <ul class="nav nav-pills">
                         <li><a href="index.jsp">Home</a></li><%
-                        if(session.getAttribute("type").equals("Teacher")){%>
+                        if(session.getAttribute("type").equals("t")){%>
                         	<li><a href="gamify.jsp">Gamify</a></li>
                         	<li><a href="stats.jsp">Assess</a></li>
                         <%}
