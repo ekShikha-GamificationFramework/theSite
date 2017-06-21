@@ -96,7 +96,7 @@
 		var alchemyDiv = document.getElementById('alchemy');
 		alchemyDiv.style.width = "80vw";
 		alchemyDiv.style.height = "95vh";
-		alchemyDiv.style.marginLeft = "19vw";
+		alchemyDiv.style.marginLeft = "20vw";
 		document.getElementById('activitySpace').style.display="none";
 
 		window.addEventListener('message', function(evt) {

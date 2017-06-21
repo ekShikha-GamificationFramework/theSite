@@ -6,6 +6,17 @@
 <script src="../public/js/alchemy.js"></script>
 <script src="../public/js/vendor.js"></script>
 <script src="../public/js/scripts.js"></script>
+<script type="text/javascript">
+	//hide obs1
+	function switchDisplay(obs1, obs2){
+		for(a of obs1){
+			document.getElementById(a).style.display="none";
+		}
+		for(a of obs2){
+			document.getElementById(a).style.display="block";
+		}
+	}
+</script>
 
 <div class="alchemy" id="alchemy" style="height:70vh; width:80vw"></div>
 
@@ -24,6 +35,7 @@
 
 <script type="text/javascript">
 	var activities=[];
+	var existingActivities=[];
 	var scenes=[];
 	var path = [];
 	var gameMapData = {
@@ -52,26 +64,41 @@
 </script>
 
 <div class="sidenav">
+	<!-- <ul id="progressbar">
+	    <li class="active">Choose Activity</li>
+	    <li>Choose Scene</li>
+	    <li>Connect</li>
+	    <li>Gamify!</li>
+	</ul>
 	<div class="form-group">
-		<div id = "actChoose" class="gamifyDiv">
-			<button class="btn btn-default" >Create new activity</button><br>or<br><a href="#">Choose from existing ones</a>
-		</div>
-		<div id="newActivityDiv" class="gamifyDiv">
-			<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
-			<input class="form-control" type="text" id="theClass" placeholder="Class"/>
-			<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
-			<input class="form-control" type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
-			<input class="form-control" type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
-			<input class="form-control" id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"/>
-			<button class="btn btn-default" onclick="activityAdder()" style="margin-top:10px; margin-bottom:10px">
+		<div id="act">
+			<div id = "actChoose" class="gamifyDiv">
+				<button class="btn btn-default" >Create new activity</button><br><span>or<br><a href="#">Choose from existing ones</a></span>
+			</div>
+			<div id="newActivityDiv" class="gamifyDiv">
+				<span>Is this the starting activity?</span><input type="checkbox" name="root" style="color: white" /><br>
+				<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
+				<input class="form-control" type="text" id="theClass" placeholder="Class"/>
+				<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
+				<select id="taxonomyLevel" name="level" class="form-control" style="width: 80%">
+					<option>Recall</option>
+					<option>Apply</option>
+					<option>Analyze</option>
+				</select>
+				<input class="form-control" type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
+				<input class="form-control" type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
+				<input class="form-control" id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"	/>
+				<button class="btn btn-default" onclick="activityAdder()" style="margin-top:10px; margin-bottom:10px">
 	        	Add activity
 	    	</button>
-		</div>
+				
+			</div>
 
-		<div id="existingActivityDiv" class="gamifyDiv">
-			<select class="form-control" id="actSelect"><%out.print(s);%></select>
-		</div>
-		
+			<div id="existingActivityDiv" class="gamifyDiv">
+				<select class="form-control" id="actSelect"><%out.print(s);%></select>
+			</div>
+    	</div>
+			
 		<div id="sceneDiv" class="gamifyDiv">	    
 		    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
 		    <input class="form-control" type="text" placeholder="Scene Link" id="sceneMedia"/>
@@ -117,7 +144,173 @@
 		        Create Game
 		    </button>
 		</div>
-    </div>
+    </div> -->
+    <!-- multistep form -->
+
+
+<form id="msform">
+	<!-- progressbar -->
+	<ul id="progressbar">
+		<li class="active">Activities</li>
+		<li>Scenes</li>
+		<li>Paths</li>
+		<li>Gamify!</li>
+	</ul>
+	<!-- fieldsets -->
+	<fieldset>
+		<div id="actChoose">
+			<h2 class="fs-title" onclick="switchDisplay(['actChoose'], ['newActivityDiv', 'back1'])"><a href="#">Create new Activity</a></h2>
+			<h3>or</h3>
+			<h3 class="fs-title" onclick='switchDisplay(["actChoose"], ["existingActivityDiv", "back1"])'><a href="#">Choose from an existing activity</a></h3>
+		</div>
+		<div id="newActivityDiv" style="display:none">
+			<input type="text" id="theName" placeholder="Activity Name"/>
+			<input type="text" id="theClass" placeholder="Class"/>
+			<input type="text" id="theScore" placeholder="Maximum Score"/>
+			<select class="form-control" id="taxonomyLevel" name="level" id="theLevel" style="margin-bottom: 10px; width:100%">
+				<option>Recall</option>
+				<option>Apply</option>
+				<option>Analyze</option>
+			</select>
+			<input type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
+			<input type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
+			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"	/>
+			<button type="button" class="btn btn-default" onclick="activityAdder('new')" style="margin-top:10px; margin-bottom:10px">
+        	Add activity
+    		</button>
+		</div>
+		<div id="existingActivityDiv" style="display:none">
+			<select class="form-control" id="actSelect"><%out.print(s);%></select>
+			<button type="button" class="btn btn-default" onclick="activityAdder('exis')" style="margin-top:10px; margin-bottom:10px">
+        	Add activity
+    		</button>
+		</div>
+		<h3 id="back1" class="fs-title" style="display: none" onclick="switchDisplay(['existingActivityDiv', 'newActivityDiv', 'back1'], ['actChoose'])"><a href="#">Back</a></h3>
+		<input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<div id="sceneDiv">	    
+		    <input type="text" id="sceneName" placeholder="Scene Name"/>
+		    <input type="text" placeholder="Scene Link" id="sceneMedia"/>
+			<button type="button" class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
+		        Add scene
+		    </button>
+	    </div>
+	    <input type="button" name="previous" class="previous action-button" value="Previous" />
+	    <input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<div id="pathDiv" style="text-align: center; width: 100%">
+			Activity #1 : <select class="form-control" id="sel1"></select>
+		    <br>
+		    Activity #2 : 
+		    <select class="form-control" id="sel2"></select>
+		    <br>		    
+		    Connecting Scene : 
+		    <select id="sel3" class="form-control"></select>
+	    	<input type="text" id="sugScore" placeholder="Suggested Score" />
+		    <button type="button" class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
+		        Connect
+		    </button>
+		</div>
+		 <input type="button" name="previous" class="previous action-button" value="Previous" />
+	    <input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
+	<fieldset>
+		<div id="gameDiv">
+		    <input type="text" id="gameName" placeholder="Name your Game!"/>
+		    <input type="text" id="gameLink" placeholder="Provide Icon Link"/>
+		    <button type="button" class="btn btn-default" onclick="gameUploader();" style="margin-top:10px; margin-bottom:10px">
+		        Create Game
+		    </button>
+		</div>
+	</fieldset>
+</form>
+
+<!-- jQuery easing plugin -->
+<script src="../public/js/jquery.easing.1.3.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	
+//jQuery time
+var current_fs, next_fs, previous_fs; //fieldsets
+var left, opacity, scale; //fieldset properties which we will animate
+var animating; //flag to prevent quick multi-click glitches
+
+$(".next").click(function(){
+	if(animating) return false;
+	animating = true;
+	
+	current_fs = $(this).parent();
+	next_fs = $(this).parent().next();
+	
+	//activate next step on progressbar using the index of next_fs
+	$("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+	
+	//show the next fieldset
+	next_fs.show(); 
+	//hide the current fieldset with style
+	current_fs.animate({opacity: 0}, {
+		step: function(now, mx) {
+			//as the opacity of current_fs reduces to 0 - stored in "now"
+			//1. scale current_fs down to 80%
+			scale = 1 - (1 - now) * 0.2;
+			//2. bring next_fs from the right(50%)
+			left = (now * 50)+"%";
+			//3. increase opacity of next_fs to 1 as it moves in
+			opacity = 1 - now;
+			current_fs.css({
+        'transform': 'scale('+scale+')',
+        'position': 'absolute'
+      });
+			next_fs.css({'left': left, 'opacity': opacity});
+		}, 
+		duration: 800, 
+		complete: function(){
+			current_fs.hide();
+			animating = false;
+		}, 
+		//this comes from the custom easing plugin
+		easing: 'easeInOutBack'
+	});
+});
+
+$(".previous").click(function(){
+	if(animating) return false;
+	animating = true;
+	
+	current_fs = $(this).parent();
+	previous_fs = $(this).parent().prev();
+	
+	//de-activate current step on progressbar
+	$("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+	
+	//show the previous fieldset
+	previous_fs.show(); 
+	//hide the current fieldset with style
+	current_fs.animate({opacity: 0}, {
+		step: function(now, mx) {
+			//as the opacity of current_fs reduces to 0 - stored in "now"
+			//1. scale previous_fs from 80% to 100%
+			scale = 0.8 + (1 - now) * 0.2;
+			//2. take current_fs to the right(50%) - from 0%
+			left = ((1-now) * 50)+"%";
+			//3. increase opacity of previous_fs to 1 as it moves in
+			opacity = 1 - now;
+			current_fs.css({'left': left});
+			previous_fs.css({'transform': 'scale('+scale+')', 'opacity': opacity});
+		}, 
+		duration: 800, 
+		complete: function(){
+			current_fs.hide();
+			animating = false;
+		}, 
+		//this comes from the custom easing plugin
+		easing: 'easeInOutBack'
+	});
+});
+
+</script>
 </div>
 <datalist id="topics"></datalist>
 
@@ -173,8 +366,35 @@ rs.next();
 
 	var curGameID = <%= rs.getInt(1) %>;
 
-    function activityAdder(){
+    function activityAdder(act){
     	
+    	if(act=="exis"){
+
+	    	var a = document.createElement("option");
+	    	var b = document.createElement("option");
+
+	    	a.text=b.text=document.getElementById("actSelect").textContent;
+	    	a.value=b.value=document.getElementById("actSelect").value;
+
+	    	existingActivities.push(a.value);
+
+	    	document.getElementById("sel1").appendChild(a);
+	    	document.getElementById("sel2").appendChild(b);
+
+	    	gameMapData.nodes.push({
+	    		"id" : a.value,
+	    		"name" : a.text
+	    	});
+
+	    	var myNode = document.getElementById("alchemy");
+			while (myNode.firstChild) {
+			    myNode.removeChild(myNode.firstChild);
+			}
+
+			alchemy = new Alchemy(config);
+    		return;
+    	}
+
     	var c = document.getElementById("theName").value;
     	var d = document.getElementById("theClass").value;
     	var e = document.getElementById("theScore").value;
@@ -215,7 +435,8 @@ rs.next();
 			"max_score" : e,
 			"topic_id" : theTopicID,
 			"creation_date" : new Date().toJSON().slice(0,10),
-			"id" : newActivityID
+			"id" : newActivityID,
+			"level" : document.getElementById('taxonomyLevel').value
 		});
 
     	newActivityID++;
@@ -277,9 +498,13 @@ rs.next();
 			path.push({
 				"act1" : parseInt(act1),
 				"act2" : parseInt(act2),
-				"scene" : parseInt(document.getElementById('sel3').selectedOptions[0].value)
+				"scene" : parseInt(document.getElementById('sel3').selectedOptions[0].value),
+				"score" : parseInt(document.getElementById('sugScore').value)
 			});
-    	}    	
+    	}  
+    	else{
+    		alert("They cant't be same!");
+    	}  	
     }
 
     function activityUploader(){
@@ -291,7 +516,8 @@ rs.next();
 				"class" : obj.class,
 				"max_score" : obj.max_score,
 				"topic_id" : obj.topic_id,
-				"creation_date" : obj.creation_date
+				"creation_date" : obj.creation_date,
+				"level" : obj.level
 			});
 
 			sendInfo("gameactivity", "i", null, {
@@ -300,6 +526,13 @@ rs.next();
 			});
     	}
     	activities=[];
+
+    	for(obj of existingActivities){
+    		sendInfo("gameactivity", "i", null, {
+    			"game_id" : curGameID,
+    			"activity_id":obj
+    		});
+    	}
     }
 
     function sceneUploader(){
@@ -315,7 +548,8 @@ rs.next();
     			"activity_id_1" : obj.act1,
     			"activity_id_2" : obj.act2,
     			"story_scene_id" : obj.scene,
-    			"game_id" : curGameID
+    			"game_id" : curGameID,
+    			"score" : obj.score
     		});
     	}
     	path=[];
