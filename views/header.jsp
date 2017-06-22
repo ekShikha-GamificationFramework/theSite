@@ -49,7 +49,4 @@
             </div>
             
             <div id="middle">
-            <script type="text/javascript">
-                document.getElementById("middle").style.marginLeft = "0px";
-            </script>
             

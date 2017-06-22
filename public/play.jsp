@@ -1,6 +1,14 @@
 <%@ page import="java.sql.*" %>
 <link rel="stylesheet" href="../public/css/styles.css"/>
 <script type="text/javascript" src="js/scripts.js"></script>
+<style type="text/css">
+	#msform fieldset:not(:first-of-type) {
+		display: block;
+	}
+	#msform fieldset{
+		position: relative;
+	}
+</style>
 
 <!-- ADD THE TAXONOMY STUFF -->
 
@@ -66,11 +74,9 @@
 	<%
 	}
 	else{%>
-	<iframe id="activitySpace" type="text/html" style="background: #000000;height:95vh; width:80vw; margin-left:19vw;"></iframe>
+	<iframe id="activitySpace" type="text/html" style="background: #000000;height:95vh; width:80vw; margin-left:20vw;"></iframe>
 	<div class="alchemy" id="alchemy"></div>
-	<div class="sidenav">
-		<button class="btn btn-default" onclick="showMap()">Map</button>
-	</div>
+	
 	<script type="text/javascript"><%
 		Boolean f = true;
 		while(f){%>
@@ -128,8 +134,46 @@
 			document.getElementById('alchemy').style.display='block';
 		}
 		</script>
+		<div style="margin-left: 20vw">MAH BOI</div>
+		<div class="sidenav">
+			<div id="msform">
+				<fieldset>
+					<div style="width: 40%; display: inline; float: left">
+						<button class="btn btn-default" style="margin-left:-1vw;padding: 30px 30px" onclick="showMap()">Map</button>
+					</div>
+					<div style="width: 60%; display: inline; float: left">
+						<span class="form-control" style="margin-top: 2.5vh;background-color:#f54747;color:#fff"><b>Now Playing</b></span>
+						<%
+							st = con.prepareStatement("select name from game where id = ?");
+							st.setInt(1, Integer.parseInt(request.getParameter("id")));
+							rs = st.executeQuery();
+							rs.next();
+						%>
+						<span><b><%out.print(rs.getString(1));%></b></span>
+					</div>
+				</fieldset>
+				<br>
+				<fieldset>
+					<h4><b><font color="#68b9fe">Top Scorers</font></b></h4>
+					<%
+						st = con.prepareStatement("select stats.student_id, sum(stats.score) from gameactivity, stats where game_id=? and gameactivity.pair_id=stats.pair_id group by stats.student_id order by sum(stats.score) desc");
+						st.setInt(1, Integer.parseInt(request.getParameter("id")));
+						rs = st.executeQuery();
+					%>
+					<table class="table table-striped">
+						<tbody class="fs-subtitle">
+							<%
+							int i = 1;
+							while(rs.next() && i<4){
+								out.print("<tr><td>"+i+"</td>"+"<td><b>"+rs.getString(1)+"</b></td>"+"<td>"+rs.getString(2)+"pts"+"</td></tr>");
+								i++;
+							}
+							%>
+						</tbody>
+					</table>
+					<span>You get to be here!</span>
+				</fieldset>
+			</div>
+		</div>
 	<%}
 	%>
-
-	
-

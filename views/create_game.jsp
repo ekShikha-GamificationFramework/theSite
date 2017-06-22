@@ -159,9 +159,10 @@
 	<!-- fieldsets -->
 	<fieldset>
 		<div id="actChoose">
-			<h2 class="fs-title" onclick="switchDisplay(['actChoose'], ['newActivityDiv', 'back1'])"><a href="#">Create new Activity</a></h2>
-			<h3>or</h3>
-			<h3 class="fs-title" onclick='switchDisplay(["actChoose"], ["existingActivityDiv", "back1"])'><a href="#">Choose from an existing activity</a></h3>
+			<h2 class="fs-title">Choose</h2>
+			<button type="button" class="btn btn-default" onclick="switchDisplay(['actChoose'], ['newActivityDiv', 'back1'])">New Activity</button>
+			<h3 class="fs-subtitle">or</h3>
+			<button type="button" class="btn btn-default" onclick='switchDisplay(["actChoose"], ["existingActivityDiv", "back1"])'>Existing Activity</button>
 		</div>
 		<div id="newActivityDiv" style="display:none">
 			<input type="text" id="theName" placeholder="Activity Name"/>
@@ -175,17 +176,18 @@
 			<input type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
 			<input type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
 			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"	/>
-			<button type="button" class="btn btn-default" onclick="activityAdder('new')" style="margin-top:10px; margin-bottom:10px">
+			<button type="button" class="btn btn-default" onclick="activityAdder('new')">
         	Add activity
     		</button>
 		</div>
 		<div id="existingActivityDiv" style="display:none">
 			<select class="form-control" id="actSelect"><%out.print(s);%></select>
+			<br>
 			<button type="button" class="btn btn-default" onclick="activityAdder('exis')" style="margin-top:10px; margin-bottom:10px">
         	Add activity
     		</button>
 		</div>
-		<h3 id="back1" class="fs-title" style="display: none" onclick="switchDisplay(['existingActivityDiv', 'newActivityDiv', 'back1'], ['actChoose'])"><a href="#">Back</a></h3>
+		<h3 id="back1" class="fs-subtitle" style="display: none" onclick="switchDisplay(['existingActivityDiv', 'newActivityDiv', 'back1'], ['actChoose'])"><a href="#">Back</a></h3>
 		<input type="button" name="next" class="next action-button" value="Next" />
 	</fieldset>
 	<fieldset>
@@ -224,6 +226,7 @@
 		        Create Game
 		    </button>
 		</div>
+		<input type="button" name="previous" class="previous action-button" value="Previous" />
 	</fieldset>
 </form>
 
@@ -537,14 +540,17 @@ rs.next();
 
     function sceneUploader(){
     	for(obj of scenes){
-    		sendInfo("story_scene", "i", {"name" : obj.name, "link": obj.link});
+    		sendInfo("story_scene", "i", null,{
+    			"name" : obj.name,
+    			"link": obj.link
+    		});
     	}
     	scenes=[];
     }
 
     function pathUploader(){
     	for(obj of path){
-    		sendInfo("path", "i", {
+    		sendInfo("path", "i", null, {
     			"activity_id_1" : obj.act1,
     			"activity_id_2" : obj.act2,
     			"story_scene_id" : obj.scene,
@@ -577,7 +583,7 @@ rs.next();
     		"creation_date" : new Date().toJSON().slice(0,10)  
     	});
 
-    	curGameID++;
+    	window.location.reload();
     }
 
 </script>

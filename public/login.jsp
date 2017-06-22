@@ -88,3 +88,9 @@
 		}
 	}
 %>
+
+<script type="text/javascript">
+	document.getElementById('top').style.marginLeft="0px";
+	document.getElementById('middle').style.marginLeft="0px";
+	document.getElementById('bottom').style.marginLeft="0px";
+</script>

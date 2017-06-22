@@ -18,3 +18,5 @@
 		out.println(e);
 	}
 %>
+
+<div class="sidenav"></div>
