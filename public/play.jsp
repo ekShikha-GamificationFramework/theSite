@@ -10,6 +10,7 @@
 	}
 </style>
 
+<head><title>Play!</title></head>
 <!-- ADD THE TAXONOMY STUFF -->
 
 <script type="text/javascript">
@@ -134,7 +135,11 @@
 			document.getElementById('alchemy').style.display='block';
 		}
 		</script>
-		<div style="margin-left: 20vw">MAH BOI</div>
+		<div style="margin-left: 20vw">
+			<ul class="nav nav-pills">
+			    <li><a href="index.jsp" style="padding:0.9vh 1.5vw;">Home</a></li>
+			</ul>
+		</div>
 		<div class="sidenav">
 			<div id="msform">
 				<fieldset>
@@ -174,6 +179,7 @@
 					<span>You get to be here!</span>
 				</fieldset>
 			</div>
+
 		</div>
 	<%}
 	%>
