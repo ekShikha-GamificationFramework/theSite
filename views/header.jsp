@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="../public/css/bootstrap.min.css" rel="stylesheet"/>
+    	<link href="../public/css/bootstrap.min.css" rel="stylesheet"/>
         <link href="../public/css/styles.css" rel="stylesheet"/>
 
         <% 
@@ -10,11 +10,11 @@
         else
         	out.println("<title>ekShiksha Gamification</title>");
         %>
-
+        
         <script src="../public/js/jquery-1.11.3.min.js"></script>
-        <script src="../public/js/bootstrap.min.js"></script>
         <script src="../public/js/scripts.js"></script>
-
+        <script src="../public/js/bootstrap.min.js"></script>
+        
     </head>
     <body>
         <div class="container">

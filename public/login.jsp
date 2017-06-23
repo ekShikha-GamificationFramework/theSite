@@ -41,18 +41,21 @@
 				Class.forName("com.mysql.jdbc.Driver"); 
 				java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123"); 
 				String s;
+				int x;
 				if(request.getParameter("type").equals("t")){
 					s="teacher";
+					x=5;
 				}
 				else{
 					s="student";
+					x=7;
 				}
 				PreparedStatement st = con.prepareStatement("select * from "+s+" where id = ?");
 				st.setString(1, request.getParameter("username"));
 				ResultSet rs=st.executeQuery();
 
 				if(rs.next()==true){
-					if(((String)request.getParameter("password")).equals(rs.getString(5))){
+					if(((String)request.getParameter("password")).equals(rs.getString(x))){
 						session.setAttribute("id", request.getParameter("username"));
 						session.setAttribute("type", request.getParameter("type"));
 						response.sendRedirect("index.jsp");
@@ -63,9 +66,9 @@
 							<jsp:param name="title" value="Login" />
 						</jsp:include>
 						<jsp:include page = "../views/apology.jsp" flush = "true" >
-							<jsp:param name="message" value="This username is not in our records!" />
+							<jsp:param name="message" value="Wrong passwords!" />
 						</jsp:include>	
-						<jsp:include page = "../views/footer.jsp" flush = "true" />
+						<jsp:include page = "../views/footer.jsp" flush = "true"/>
 					<%
 					}
 				} 

@@ -1,12 +1,20 @@
 <%@ page import="java.sql.*" %>
 <link rel="stylesheet" href="../public/css/styles.css"/>
-<script type="text/javascript" src="js/scripts.js"></script>
+<link rel="stylesheet" href="../public/css/alchemy.min.css"/>
+<link rel="stylesheet" href="../public/css/vendor.css"/>
+<script src="../public/js/d3.v3.min.js"></script>
+<script src="../public/js/alchemy.js"></script>
+<script src="../public/js/vendor.js"></script>
+<script src="../public/js/scripts.js"></script>
 <style type="text/css">
 	#msform fieldset:not(:first-of-type) {
 		display: block;
 	}
 	#msform fieldset{
 		position: relative;
+	}
+	.nav li a{
+		padding:0.9vh 1.5vw;
 	}
 </style>
 
@@ -21,6 +29,7 @@
 	};
 
 	var links = {};
+	var scoreObject;
 
 	var config = {
 		dataSource: fetchedGameMapData,
@@ -45,13 +54,6 @@
 	};
 
 </script>
-
-<link rel="stylesheet" href="../public/css/alchemy.min.css"/>
-<link rel="stylesheet" href="../public/css/vendor.css"/>
-<script src="../public/js/d3.v3.min.js"></script>
-<script src="../public/js/alchemy.js"></script>
-<script src="../public/js/vendor.js"></script>
-<script src="../public/js/scripts.js"></script>
 
 <%
 	if(request.getParameter("id")==null){
@@ -107,7 +109,8 @@
 		document.getElementById('activitySpace').style.display="none";
 
 		window.addEventListener('message', function(evt) {
-			if(confirm("Game over! You scored "+evt.data+"!\nPlay again?")){
+			scoreObject = evt.data;
+			if(confirm("Game over! You scored "+evt.data+"!\nRetry?")){
 				var actSpace = document.getElementById('activitySpace');
 				//refresh
 				actSpace.src = actSpace.src;
@@ -120,12 +123,14 @@
 				//save only when a student is playing
 				if(userID!="null" && userType=="s"){
 					<%
-						
-					%>
-					// sendInfo("stats", "i", {
-					// 	"student_id" : userID,
 
-					// });
+					%>
+					sendInfo('gameactivity', 's', getPairID, {
+						"selections" : ['pair_id'],
+						"lhs" : ['game_id', 'activity_id'],
+						"operator" : ['=', '='],
+						"rhs" : ["<%out.print(request.getParameter("id"));%>", window.clickedNode]  
+					});
 				}
 			}
 		});
@@ -134,10 +139,46 @@
 			document.getElementById('activitySpace').src=""; 
 			document.getElementById('alchemy').style.display='block';
 		}
+		function getStudentDetails(){
+			if(request.readyState==4 && request.status == 200){
+				var obj = JSON.parse(request.responseText);
+	    		if(obj.length==0){
+	    			sendInfo('stats', 'i', null, {
+	    				"student_id" : "<%out.print(session.getAttribute("id"));%>",
+    					"pair_id" : window.curPair,
+    					"score" : scoreObject.score,
+    					"last_played" : new Date().toJSON().slice(0,10)
+	    			});
+	    		} 
+				else{
+					sendInfo("stats", "u", null, {
+						"updates" : ["last_played"],
+						"updateWith" : [new Date().toJSON().slice(0,10)],
+						"lhs" : ["student_id", "pair_id"],
+						"operator" : ["=", "="],
+						"rhs" : ["<%out.print(session.getAttribute("id"));%>", window.curPair]
+					});
+				}
+			}
+		}
+
+		function getPairID(){
+			if(request.readyState==4 && request.status == 200){
+				var obj = JSON.parse(request.responseText);
+				window.curPair = obj[0].pair_id;
+    			sendInfo('stats', 's', getStudentDetails, {
+    				"selections" : ["student_id"],
+    				"lhs" : ["student_id", "pair_id"],
+    				"operator" : ["=", "="],
+    				"rhs" : ["<%out.print(session.getAttribute("id"));%>", obj[0].pair_id]
+    			});
+			}
+		}
 		</script>
 		<div style="margin-left: 20vw">
 			<ul class="nav nav-pills">
-			    <li><a href="index.jsp" style="padding:0.9vh 1.5vw;">Home</a></li>
+			    <li><a href="index.jsp">Home</a></li>
+			    <li><a href="#">Dummy</a></li>
 			</ul>
 		</div>
 		<div class="sidenav">
@@ -176,7 +217,11 @@
 							%>
 						</tbody>
 					</table>
-					<span>You get to be here!</span>
+					<%
+						if(request.getParameter("type")!=null && request.getParameter("type").equals("s")){
+							out.print("<span>You get to be here!</span>");
+						}
+					%>
 				</fieldset>
 			</div>
 

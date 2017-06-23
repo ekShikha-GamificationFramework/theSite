@@ -78,4 +78,30 @@ else if(request.getParameter("type").equals("s")){
 	}
 	con.close();
 }
+else if(request.getParameter("type").equals("u")){
+	String[] upd = request.getParameterValues("updates");
+	String[] updWith = request.getParameterValues("updateWith");
+	int columns = upd.length;
+	s1 = "update " + request.getParameter("table") + " set ";
+	for(int i = 0; i < columns; i++){
+		s1 = s1 + upd[i]+"="+"\""+updWith[i]+"\""+",";
+	}
+	s2 = " where ";
+	
+	String[] lhs = request.getParameterValues("lhs");
+	String[] operator = request.getParameterValues("operator");
+	String[] rhs = request.getParameterValues("rhs");
+	int conditions = lhs.length;
+
+	for(int i=0; i<conditions; i++){
+		try{  
+			s2 = s2 + lhs[i] + " " + operator[i] + " " + Integer.parseInt(rhs[i]) + " and ";
+		}  
+		catch(NumberFormatException nfe){  
+			s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
+		}  
+	}
+	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
+	st.executeUpdate();
+}
 %>
