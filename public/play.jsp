@@ -29,7 +29,7 @@
 	};
 
 	var links = {};
-	var scoreObject;
+	var scoreObject={};
 
 	var config = {
 		dataSource: fetchedGameMapData,
@@ -109,7 +109,7 @@
 		document.getElementById('activitySpace').style.display="none";
 
 		window.addEventListener('message', function(evt) {
-			scoreObject = evt.data;
+			scoreObject.score = evt.data;
 			if(confirm("Game over! You scored "+evt.data+"!\nRetry?")){
 				var actSpace = document.getElementById('activitySpace');
 				//refresh
@@ -152,8 +152,8 @@
 	    		} 
 				else{
 					sendInfo("stats", "u", null, {
-						"updates" : ["last_played"],
-						"updateWith" : [new Date().toJSON().slice(0,10)],
+						"updates" : ["last_played", "score"],
+						"updateWith" : [new Date().toJSON().slice(0,10), "greatest(score,"+scoreObject.score+")"],
 						"lhs" : ["student_id", "pair_id"],
 						"operator" : ["=", "="],
 						"rhs" : ["<%out.print(session.getAttribute("id"));%>", window.curPair]

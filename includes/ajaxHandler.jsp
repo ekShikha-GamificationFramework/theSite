@@ -84,7 +84,12 @@ else if(request.getParameter("type").equals("u")){
 	int columns = upd.length;
 	s1 = "update " + request.getParameter("table") + " set ";
 	for(int i = 0; i < columns; i++){
-		s1 = s1 + upd[i]+"="+"\""+updWith[i]+"\""+",";
+		if(updWith[i].indexOf('(')!=-1){
+			s1 = s1 + upd[i]+"="+updWith[i]+",";
+		}
+		else{
+			s1 = s1 + upd[i]+"="+"\""+updWith[i]+"\""+",";
+		}
 	}
 	s2 = " where ";
 	
@@ -101,7 +106,6 @@ else if(request.getParameter("type").equals("u")){
 			s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
 		}  
 	}
-	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
-	st.executeUpdate();
+	out.print(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
 }
 %>
