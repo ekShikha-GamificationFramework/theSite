@@ -106,6 +106,8 @@ else if(request.getParameter("type").equals("u")){
 			s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
 		}  
 	}
-	out.print(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
+	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
+	st.executeUpdate();
+	con.close();
 }
 %>

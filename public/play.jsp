@@ -29,6 +29,7 @@
 	};
 
 	var links = {};
+	var iconLinks = {};
 	var scoreObject={};
 
 	var config = {
@@ -46,6 +47,18 @@
 				var obj = document.getElementById('activitySpace');
 				obj.style.display="block";
 				obj.src = links[window.clickedNode];
+				document.getElementById('curLevel').style.display="block";
+				var img = document.getElementById('actImage');
+				img.src=iconLinks[window.clickedNode];
+				if(img.src==""){
+					img.style.height="0px";
+				}
+				for(a of fetchedGameMapData.nodes){
+					if(parseInt(a.id)==window.clickedNode){
+						document.getElementById('imgText').textContent=a.name;
+						break;
+					}
+				}
 			}
 		},
 		nodeCaption: function(node){ 
@@ -62,7 +75,7 @@
 
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
-	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
+	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
 	if(rs.next()==false){
@@ -88,6 +101,7 @@
 				"name" : "<%out.print(rs.getString(2));%>"
 			});
 			links[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(3));%>";
+			iconLinks[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(4));%>";
 			<%
 			f=rs.next();
 		}
@@ -110,6 +124,18 @@
 
 		window.addEventListener('message', function(evt) {
 			scoreObject.score = evt.data;
+			var userID = "<%out.print(session.getAttribute("id"));%>";
+			var userType = "<%out.print(session.getAttribute("type"));%>";
+
+			//save only when a student is playing
+			if(userID!="null" && userType=="s"){
+				sendInfo('gameactivity', 's', getPairID, {
+					"selections" : ['pair_id'],
+					"lhs" : ['game_id', 'activity_id'],
+					"operator" : ['=', '='],
+					"rhs" : ["<%out.print(request.getParameter("id"));%>", window.clickedNode]  
+				});
+			}
 			if(confirm("Game over! You scored "+evt.data+"!\nRetry?")){
 				var actSpace = document.getElementById('activitySpace');
 				//refresh
@@ -117,27 +143,13 @@
 			}		
 			else{
 				showMap();
-				var userID = "<%out.print(session.getAttribute("id"));%>";
-				var userType = "<%out.print(session.getAttribute("type"));%>";
-
-				//save only when a student is playing
-				if(userID!="null" && userType=="s"){
-					<%
-
-					%>
-					sendInfo('gameactivity', 's', getPairID, {
-						"selections" : ['pair_id'],
-						"lhs" : ['game_id', 'activity_id'],
-						"operator" : ['=', '='],
-						"rhs" : ["<%out.print(request.getParameter("id"));%>", window.clickedNode]  
-					});
-				}
 			}
 		});
 		function showMap(){
 			document.getElementById('activitySpace').style.display='none';
 			document.getElementById('activitySpace').src=""; 
 			document.getElementById('alchemy').style.display='block';
+			document.getElementById('curLevel').style.display="none";
 		}
 		function getStudentDetails(){
 			if(request.readyState==4 && request.status == 200){
@@ -185,7 +197,7 @@
 			<div id="msform">
 				<fieldset>
 					<div style="width: 40%; display: inline; float: left">
-						<button class="btn btn-default" style="margin-left:-1vw;padding: 30px 30px" onclick="showMap()">Map</button>
+						<button class="btn btn-default" style="margin-left:-1vw;padding: 5vh 2.5vw" onclick="showMap()">Map</button>
 					</div>
 					<div style="width: 60%; display: inline; float: left">
 						<span class="form-control" style="margin-top: 2.5vh;background-color:#f54747;color:#fff"><b>Now Playing</b></span>
@@ -218,10 +230,20 @@
 						</tbody>
 					</table>
 					<%
-						if(request.getParameter("type")!=null && request.getParameter("type").equals("s")){
+						if(session.getAttribute("type")!=null && session.getAttribute("type").equals("s")){
 							out.print("<span>You get to be here!</span>");
 						}
 					%>
+				</fieldset>
+				<br>
+				<fieldset id="curLevel" style="display: none">
+					<h4><b><font color="#68b9fe">Current Level</font></b></h4>
+					<center>
+						<div style="width:80%;"">
+							<img id="actImage" style="width:100%;" src=""></img>
+							<b><span id="imgText"></span></b>
+						</div>
+					</center>
 				</fieldset>
 			</div>
 
