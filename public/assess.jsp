@@ -83,7 +83,7 @@
 	function getStudentData(){
 		var studID = document.getElementById('studName').value;
 		sendInfo("gameactivity, stats, game", "s", putStudentGameData, {
-			"selections" : ["game.name", "icon_link", "sum(score)", "max(last_played)"],
+			"selections" : ["game.name", "icon_link", "sum(score)", "max(last_played)", "game_id"],
 			"lhs" : ["gameactivity.pair_id", "stats.student_id", "game_id"],
 			"operator" : ["=", "=", "="],
 			"rhs" : ["(stats.pair_id)", studID, "(id)"],
@@ -122,7 +122,7 @@
 						cells.push(row.insertCell(i));
 					}
 
-					cells[0].innerHTML = "<img class='gameImage' src="+a.icon_link+"></img>";
+					cells[0].innerHTML = "<a href='play.jsp?id="+a["game_id"]+"'><img class='gameImage' src="+a.icon_link+"></img></a>";
 					cells[1].innerHTML = "<b>"+a["game.name"]+"</b>";
 					cells[2].innerHTML = a["sum(score)"];
 					cells[3].innerHTML = a["max(last_played)"];
