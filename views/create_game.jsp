@@ -5,7 +5,6 @@
 <script src="../public/js/d3.v3.min.js"></script>
 <script src="../public/js/alchemy.js"></script>
 <script src="../public/js/vendor.js"></script>
-<script src="../public/js/scripts.js"></script>
 <script type="text/javascript">
 	//hide obs1
 	function switchDisplay(obs1, obs2){
@@ -148,7 +147,7 @@
     <!-- multistep form -->
 
 
-<form id="msform">
+<div id="msform">
 	<!-- progressbar -->
 	<ul id="progressbar">
 		<li class="active">Activities</li>
@@ -175,7 +174,7 @@
 			</select>
 			<input type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
 			<input type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
-			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"	/>
+			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"/>
 			<button type="button" class="btn btn-default" onclick="activityAdder('new')">
         	Add activity
     		</button>
@@ -228,7 +227,7 @@
 		</div>
 		<input type="button" name="previous" class="previous action-button" value="Previous" />
 	</fieldset>
-</form>
+</div>
 
 <!-- jQuery easing plugin -->
 <script src="../public/js/jquery.easing.1.3.js" type="text/javascript"></script>

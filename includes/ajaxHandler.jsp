@@ -20,13 +20,7 @@ if(request.getParameter("type").equals("i")){
 			continue;
 		}
 		s1=s1 + parameter + ",";
-		try{  
-			int a = Integer.parseInt(parameters.get(parameter)[0]);  
-			s2=s2 + a + ",";
-		}  
-		catch(NumberFormatException nfe){  
-			s2=s2 + "\""+parameters.get(parameter)[0]+"\"" + ",";
-		}  
+		s2=s2 + "\""+parameters.get(parameter)[0]+"\"" + ",";
 	}
 	s1=s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-1) + ")";
 
@@ -49,15 +43,18 @@ else if(request.getParameter("type").equals("s")){
 	int conditions = lhs.length;
 
 	for(int i=0; i<conditions; i++){
-		try{  
-			s2 = s2 + lhs[i] + " " + operator[i] + " " + Integer.parseInt(rhs[i]) + " and ";
-		}  
-		catch(NumberFormatException nfe){  
+		if(rhs[i].indexOf('(')!=-1){  
+			s2 = s2 + lhs[i] + " " + operator[i] + " " + (rhs[i]) + " and ";
+		}
+		else{
 			s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
-		}  
+		} 
 	}
-
-	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
+	String x = " ";
+	if(request.getParameter("extra")!=null){
+		x+=request.getParameter("extra");
+	}
+	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4) + x);
 	ResultSet rs = st.executeQuery();
 
 	//send JSON
@@ -99,12 +96,7 @@ else if(request.getParameter("type").equals("u")){
 	int conditions = lhs.length;
 
 	for(int i=0; i<conditions; i++){
-		try{  
-			s2 = s2 + lhs[i] + " " + operator[i] + " " + Integer.parseInt(rhs[i]) + " and ";
-		}  
-		catch(NumberFormatException nfe){  
-			s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
-		}  
+		s2 = s2 + lhs[i] + " " + operator[i] + " \"" + (rhs[i]) + "\" and ";
 	}
 	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4));
 	st.executeUpdate();

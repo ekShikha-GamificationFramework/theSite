@@ -19,7 +19,6 @@
 </style>
 
 <head><title>Play!</title></head>
-<!-- ADD THE TAXONOMY STUFF -->
 
 <script type="text/javascript">
 
@@ -239,7 +238,7 @@
 				<fieldset id="curLevel" style="display: none">
 					<h4><b><font color="#68b9fe">Current Level</font></b></h4>
 					<center>
-						<div style="width:80%;"">
+						<div style="width:80%;">
 							<img id="actImage" style="width:100%;" src=""></img>
 							<b><span id="imgText"></span></b>
 						</div>

@@ -28,7 +28,7 @@
                         <li><a href="index.jsp">Home</a></li><%
                         if(session.getAttribute("type").equals("t")){%>
                         	<li><a href="gamify.jsp">Gamify</a></li>
-                        	<li><a href="stats.jsp">Assess</a></li>
+                        	<li><a href="assess.jsp">Assess</a></li>
                         <%}
                         else{%>
                         	<li><a href="leaderboard.jsp">Leaderboard</a></li>
