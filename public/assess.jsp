@@ -35,7 +35,7 @@
 </div>
 
 <div id="game" class="tabcontent" style="display: block">
-
+<h3><b>Nothing yet.</b></h3>
 </div>
 
 <div id="act" class="tabcontent">
@@ -106,7 +106,7 @@
 			var obj = JSON.parse(request.responseText);
 			var gamesList = document.getElementById('game');
 			if(obj.length==0){
-				gamesList.innerHTML="<h3><b>No games played yet.</b></h3>";
+				gamesList.innerHTML="<h3><b>Nothing yet.</b></h3>";
 			}
 			else{
 				gamesList.innerHTML = "";
@@ -147,7 +147,7 @@
 			var obj = JSON.parse(request.responseText);
 			var activityList = document.getElementById('act');
 			if(obj.length==0){
-				activityList.innerHTML="<h3><b>No games played yet.</b></h3>";
+				activityList.innerHTML="<h3><b>Nothing yet.</b></h3>";
 			}
 			else{
 				activityList.innerHTML = "";
@@ -179,6 +179,54 @@
 					cells[3].innerHTML = a["stats.last_played"];
 				}
 				activityList.appendChild(table);
+			}
+		}
+	}
+
+	function getStudentTopicData(){
+		var studID = document.getElementById('studName').value;
+		sendInfo("gameactivity, stats, activity, topic", "s", putStudentTopicData, {
+			"selections" : ["topic.name", "sum(stats.score)"],
+			"lhs" : ["gameactivity.pair_id", "stats.student_id", "activity.id", "topic.id"],
+			"operator" : ["=", "=", "=", "="],
+			"rhs" : ["(stats.pair_id)", studID, "(gameactivity.activity_id)", "(activity.topic_id)"],
+			"extra" : "group by topic.id"
+		});
+	}
+
+	function putStudentTopicData(){
+		if(request.readyState==4 && request.status == 200){
+			var obj = JSON.parse(request.responseText);
+			var topicList = document.getElementById('topic');
+			if(obj.length==0){
+				topicList.innerHTML="<h3><b>Nothing yet.</b></h3>";
+			}
+			else{
+				topicList.innerHTML = "";
+				var table = document.createElement('table');
+				var thead = table.createTHead();
+				var tbody = table.createTBody();
+				var head = thead.insertRow(0);
+				var headings = [];
+				for(var i=0; i<2; i++){
+					headings.push(head.insertCell(i));
+				}
+
+				headings[0].innerHTML = "Topic Name";
+				headings[1].innerHTML = "Score";
+				table.className= "table table-striped";
+				var j = 0;
+				for(a of obj){
+					var row = tbody.insertRow(j++);
+					var cells = [];
+					for(var i=0; i<2; i++){
+						cells.push(row.insertCell(i));
+					}
+
+					cells[0].innerHTML = "<b>"+a["topic.name"]+"</b>";
+					cells[1].innerHTML = a["sum(stats.score)"];
+				}
+				topicList.appendChild(table);
 			}
 		}
 	}
