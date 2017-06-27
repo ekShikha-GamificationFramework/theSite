@@ -30,10 +30,8 @@
                         	<li><a href="gamify.jsp">Gamify</a></li>
                         	<li><a href="assess.jsp">Assess</a></li>
                         <%}
-                        else{%>
-                        	<li><a href="leaderboard.jsp">Leaderboard</a></li>
-                    	<%}
                         %>
+                        <li><a href="leaderboard.jsp">Leaderboard</a></li>
                         <li><a href="logout.jsp"><strong>Log Out</strong></a></li>
                     </ul>
 

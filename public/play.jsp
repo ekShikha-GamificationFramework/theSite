@@ -145,6 +145,16 @@
 			}
 		});
 		function showMap(){
+			var myNode = document.getElementById("alchemy");
+			while (myNode.firstChild) {
+			    myNode.removeChild(myNode.firstChild);
+			}
+
+			alchemy = new Alchemy(config);
+			var alchemyDiv = document.getElementById('alchemy');
+			alchemyDiv.style.width = "80vw";
+			alchemyDiv.style.height = "95vh";
+			alchemyDiv.style.marginLeft = "20vw";
 			document.getElementById('activitySpace').style.display='none';
 			document.getElementById('activitySpace').src=""; 
 			document.getElementById('alchemy').style.display='block';
