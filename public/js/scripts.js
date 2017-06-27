@@ -82,7 +82,7 @@ function sendInfo(table, type, func, dict){
 		if(type=="s"){
 			request.onreadystatechange=func;  
 		}
-		request.open("GET", url, true);  
+		request.open("POST", url, true);  
 		request.send();  
 	}
 	catch(e){
