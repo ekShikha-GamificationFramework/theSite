@@ -19,9 +19,9 @@
     <body>
         <div class="container">
             <div id="top">
-                <div>
+                <!-- <div>
                     <a href="../public/index.jsp"><img alt="Gamification" src="../public/img/logo.png"/></a>
-                </div>
+                </div> -->
                 <% if (session.getAttribute("id")!=null && session.getAttribute("type")!=null){ %>
 	                
                     <ul class="nav nav-pills">

@@ -186,7 +186,7 @@
 	function getStudentTopicData(){
 		var studID = document.getElementById('studName').value;
 		sendInfo("gameactivity, stats, activity, topic", "s", putStudentTopicData, {
-			"selections" : ["topic.name", "sum(stats.score)"],
+			"selections" : ["topic.name", "sum(stats.score)", "max(last_played)"],
 			"lhs" : ["gameactivity.pair_id", "stats.student_id", "activity.id", "topic.id"],
 			"operator" : ["=", "=", "=", "="],
 			"rhs" : ["(stats.pair_id)", studID, "(gameactivity.activity_id)", "(activity.topic_id)"],
@@ -208,25 +208,77 @@
 				var tbody = table.createTBody();
 				var head = thead.insertRow(0);
 				var headings = [];
-				for(var i=0; i<2; i++){
+				for(var i=0; i<3; i++){
 					headings.push(head.insertCell(i));
 				}
 
 				headings[0].innerHTML = "Topic Name";
 				headings[1].innerHTML = "Score";
+				headings[2].innerHTML = "Last Played";
 				table.className= "table table-striped";
 				var j = 0;
 				for(a of obj){
 					var row = tbody.insertRow(j++);
 					var cells = [];
-					for(var i=0; i<2; i++){
+					for(var i=0; i<3; i++){
 						cells.push(row.insertCell(i));
 					}
 
 					cells[0].innerHTML = "<b>"+a["topic.name"]+"</b>";
 					cells[1].innerHTML = a["sum(stats.score)"];
+					cells[2].innerHTML = a["max(last_played)"];
 				}
 				topicList.appendChild(table);
+			}
+		}
+	}
+
+	function getStudentTaxonomyData(){
+		var studID = document.getElementById('studName').value;
+		sendInfo("gameactivity, stats, activity", "s", putStudentTaxonomyData, {
+			"selections" : ["activity.level", "sum(stats.score)", "max(last_played)"],
+			"lhs" : ["gameactivity.pair_id", "stats.student_id", "activity.id"],
+			"operator" : ["=", "=", "="],
+			"rhs" : ["(stats.pair_id)", studID, "(gameactivity.activity_id)"],
+			"extra" : "group by activity.level"
+		});
+	}
+
+	function putStudentTaxonomyData(){
+		if(request.readyState==4 && request.status == 200){
+			var obj = JSON.parse(request.responseText);
+			var taxonomyList = document.getElementById('taxo');
+			if(obj.length==0){
+				taxonomyList.innerHTML="<h3><b>Nothing yet.</b></h3>";
+			}
+			else{
+				taxonomyList.innerHTML = "";
+				var table = document.createElement('table');
+				var thead = table.createTHead();
+				var tbody = table.createTBody();
+				var head = thead.insertRow(0);
+				var headings = [];
+				for(var i=0; i<3; i++){
+					headings.push(head.insertCell(i));
+				}
+
+				headings[0].innerHTML = "Taxonomy Level";
+				headings[1].innerHTML = "Score";
+				headings[2].innerHTML = "Last Played";
+				table.className= "table table-striped";
+				var j = 0;
+				for(a of obj){
+					var row = tbody.insertRow(j++);
+					var cells = [];
+					for(var i=0; i<3; i++){
+						cells.push(row.insertCell(i));
+					}
+
+					cells[0].innerHTML = "<b>"+a["activity.level"]+"</b>";
+					cells[1].innerHTML = a["sum(stats.score)"];
+					cells[2].innerHTML = a["max(last_played)"];
+				}
+				taxonomyList.appendChild(table);
 			}
 		}
 	}
