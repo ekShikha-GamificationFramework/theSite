@@ -185,11 +185,11 @@
 
 	function getStudentTopicData(){
 		var studID = document.getElementById('studName').value;
-		sendInfo("gameactivity, stats, activity, topic", "s", putStudentTopicData, {
+		sendInfo("gameactivity, stats, topic", "s", putStudentTopicData, {
 			"selections" : ["topic.name", "sum(stats.score)", "max(last_played)"],
-			"lhs" : ["gameactivity.pair_id", "stats.student_id", "activity.id", "topic.id"],
+			"lhs" : ["gameactivity.pair_id", "stats.student_id", "topic.id"],
 			"operator" : ["=", "=", "=", "="],
-			"rhs" : ["(stats.pair_id)", studID, "(gameactivity.activity_id)", "(activity.topic_id)"],
+			"rhs" : ["(stats.pair_id)", studID, "(gameactivity.topic_id)"],
 			"extra" : "group by topic.id"
 		});
 	}

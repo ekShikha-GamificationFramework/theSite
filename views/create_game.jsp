@@ -167,20 +167,22 @@
 			<input type="text" id="theName" placeholder="Activity Name"/>
 			<input type="text" id="theClass" placeholder="Class"/>
 			<input type="text" id="theScore" placeholder="Maximum Score"/>
-			<select class="form-control" id="taxonomyLevel" name="level" id="theLevel" style="margin-bottom: 10px; width:100%">
+			<!-- <select class="form-control" id="taxonomyLevel" name="level" id="theLevel" style="margin-bottom: 10px; width:100%">
+
 				<option>Recall</option>
 				<option>Apply</option>
 				<option>Analyze</option>
-			</select>
+			</select> -->
 			<input type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
 			<input type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
-			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"/>
+			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic('')"/>
 			<button type="button" class="btn btn-default" onclick="activityAdder('new')">
         	Add activity
     		</button>
 		</div>
 		<div id="existingActivityDiv" style="display:none">
 			<select class="form-control" id="actSelect"><%out.print(s);%></select>
+			<input id="theTopics1" list="topics" placeholder="Topic" onkeypress="searchTopic('1')"/>
 			<br>
 			<button type="button" class="btn btn-default" onclick="activityAdder('exis')" style="margin-top:10px; margin-bottom:10px">
         	Add activity
@@ -371,89 +373,23 @@ rs.next();
     function activityAdder(act){
     	
     	if(act=="exis"){
-
-	    	var a = document.createElement("option");
-	    	var b = document.createElement("option");
-
-	    	a.text=b.text=document.getElementById("actSelect").textContent;
-	    	a.value=b.value=document.getElementById("actSelect").value;
-
-	    	existingActivities.push(a.value);
-
-	    	document.getElementById("sel1").appendChild(a);
-	    	document.getElementById("sel2").appendChild(b);
-
-	    	gameMapData.nodes.push({
-	    		"id" : a.value,
-	    		"name" : a.text
+	    	sendInfo("topic", "s", getTopicID, {
+	    		"selections" : ["id"],
+	    		"lhs" : ["name"],
+	    		"operator" : ["="],
+	    		"rhs" : [document.getElementById("theTopics1").value] 
 	    	});
 
-	    	var myNode = document.getElementById("alchemy");
-			while (myNode.firstChild) {
-			    myNode.removeChild(myNode.firstChild);
-			}
-
-			alchemy = new Alchemy(config);
     		return;
     	}
 
-    	var c = document.getElementById("theName").value;
-    	var d = document.getElementById("theClass").value;
-    	var e = document.getElementById("theScore").value;
-    	var f = document.getElementById("theIcon").value;
-    	var g = document.getElementById("theLink").value;
-
-    	if(c=="" || d=="" || e=="" || g==""){
-    		alert("Don't leave it empty!");
-    		return;
-    	}
-
-    	var a = document.createElement("option");
-    	var b = document.createElement("option");
-
-    	a.text=b.text=c;
-    	a.value=b.value=newActivityID;
-
-    	document.getElementById("sel1").appendChild(a);
-    	document.getElementById("sel2").appendChild(b);
     	
-    	gameMapData.nodes.push({
-    		"id" : newActivityID,
-    		"name" : c
-    	});
-
     	sendInfo("topic", "s", getTopicID, {
     		"selections" : ["id"],
     		"lhs" : ["name"],
     		"operator" : ["="],
     		"rhs" : [document.getElementById("theTopics").value] 
     	});
-
-    	activities.push({
-			"name" : c,
-			"icon_link" : f,
-			"program_link" : g, 
-			"class" : d,
-			"max_score" : e,
-			"topic_id" : theTopicID,
-			"creation_date" : new Date().toJSON().slice(0,10),
-			"id" : newActivityID,
-			"level" : document.getElementById('taxonomyLevel').value
-		});
-
-    	newActivityID++;
-    	var myNode = document.getElementById("alchemy");
-		while (myNode.firstChild) {
-		    myNode.removeChild(myNode.firstChild);
-		}
-
-		alchemy = new Alchemy(config);
-
-		document.getElementById("theName").value="";
-    	document.getElementById("theClass").value="";
-    	document.getElementById("theScore").value="";
-    	document.getElementById("theIcon").value="";
-    	document.getElementById("theLink").value="";
     }
 
     function sceneAdder(){
@@ -517,14 +453,15 @@ rs.next();
 				"program_link" : obj.program_link, 
 				"class" : obj.class,
 				"max_score" : obj.max_score,
-				"topic_id" : obj.topic_id,
+				// "topic_id" : obj.topic_id,
 				"creation_date" : obj.creation_date,
 				"level" : obj.level
 			});
 
 			sendInfo("gameactivity", "i", null, {
 				"game_id" : curGameID,
-				"activity_id" : obj.id
+				"activity_id" : obj.id,
+				"topic_id" : obj.topic_id
 			});
     	}
     	activities=[];
@@ -532,7 +469,8 @@ rs.next();
     	for(obj of existingActivities){
     		sendInfo("gameactivity", "i", null, {
     			"game_id" : curGameID,
-    			"activity_id":obj
+    			"activity_id":obj.id,
+    			"topic_id" : obj.topic_id
     		});
     	}
     }
@@ -588,8 +526,8 @@ rs.next();
 </script>
 
 <script type="text/javascript">
-    function searchTopic(){
-    	var text = document.getElementById('theTopics').value;
+    function searchTopic(x){
+    	var text = document.getElementById('theTopics'+x).value;
     	sendInfo("topic", "s", putTopic, {
     		"selections" : ["name", "id"],
     		"lhs" : ["name"],
@@ -611,16 +549,99 @@ rs.next();
     	if(request.readyState==4 && request.status == 200){
     		var obj = JSON.parse(request.responseText);
     		if(obj.length==0){
-    			setTopicID();
+    			if(document.getElementById("newActivityDiv").style.display=="none"){
+    				setTopicID("s");
+    			}
+    			else{
+    				setTopicID("");
+    			}
     		} 
 			else{
 				theTopicID = parseInt(obj[0].id);
+				if(document.getElementById("newActivityDiv").style.display=="none"){
+					var a = document.createElement("option");
+			    	var b = document.createElement("option");
+
+			    	a.text=b.text=document.getElementById("actSelect").selectedOptions[0].text;
+			    	a.value=b.value=document.getElementById("actSelect").value;
+
+			    	existingActivities.push({
+			    		"id" : a.value,
+			    		"topic_id" : theTopicID
+			    	});
+
+			    	document.getElementById("sel1").appendChild(a);
+			    	document.getElementById("sel2").appendChild(b);
+
+			    	gameMapData.nodes.push({
+			    		"id" : a.value+"-"+theTopicID,
+			    		"name" : a.text
+			    	});
+
+			    	var myNode = document.getElementById("alchemy");
+					while (myNode.firstChild) {
+					    myNode.removeChild(myNode.firstChild);
+					}
+
+					alchemy = new Alchemy(config);
+				}
+				else{
+					var c = document.getElementById("theName").value;
+			    	var d = document.getElementById("theClass").value;
+			    	var e = document.getElementById("theScore").value;
+			    	var f = document.getElementById("theIcon").value;
+			    	var g = document.getElementById("theLink").value;
+
+			    	if(c=="" || d=="" || e=="" || g==""){
+			    		alert("Don't leave it empty!");
+			    		return;
+			    	}
+
+			    	var a = document.createElement("option");
+			    	var b = document.createElement("option");
+
+			    	a.text=b.text=c;
+			    	a.value=b.value=newActivityID;
+
+			    	document.getElementById("sel1").appendChild(a);
+			    	document.getElementById("sel2").appendChild(b);
+			    	
+			    	gameMapData.nodes.push({
+			    		"id" : newActivityID+"-"+theTopicID,
+			    		"name" : c
+			    	});
+
+			    	activities.push({
+						"name" : c,
+						"icon_link" : f,
+						"program_link" : g, 
+						"class" : d,
+						"max_score" : e,
+						"creation_date" : new Date().toJSON().slice(0,10),
+						"id" : newActivityID,
+						"level" : document.getElementById('taxonomyLevel').value
+					});
+
+					newActivityID++;
+					var myNode = document.getElementById("alchemy");
+					while (myNode.firstChild) {
+					    myNode.removeChild(myNode.firstChild);
+					}
+
+					alchemy = new Alchemy(config);
+
+					document.getElementById("theName").value="";
+					document.getElementById("theClass").value="";
+					document.getElementById("theScore").value="";
+					document.getElementById("theIcon").value="";
+					document.getElementById("theLink").value="";
+				}
 			}
     	}
     }
-    function setTopicID(){
+    function setTopicID(s){
     	sendInfo("topic", "i", null, {
-    		"name" : document.getElementById("theTopics").value
+    		"name" : document.getElementById("theTopics"+s).value
     	});
     	theTopicID++;
     }

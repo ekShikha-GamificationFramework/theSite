@@ -1043,6 +1043,8 @@
         }
       },
       nodeClick: function(n) {
+         window.prevclickedNode = window.clickedNode;
+        window.clickedNode = n.id;      //added this to get the node clicked
         var node;
         if (d3.event.defaultPrevented) {
           return;
@@ -1059,9 +1061,6 @@
             }
             return "selected";
           })();
-
-          window.clickedNode = node.id;			//added this to get the node clicked
-
           return node.setStyles();
         }
       },

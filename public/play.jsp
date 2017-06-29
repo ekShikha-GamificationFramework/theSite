@@ -29,35 +29,51 @@
 
 	var links = {};
 	var iconLinks = {};
+	var maxScores = {};
+	var interludeLinks = {};
 	var scoreObject={};
 
 	var config = {
 		dataSource: fetchedGameMapData,
 		forceLocked: true,     
-		linkDistance: function(){ return 25; },
+		linkDistancefn: function(){ return 75; },
+		directedEdges : true,
 		nodeStyle : {
 			"all" : {
 				"radius" :20
 			}
 		},
 		nodeClick : function(){
+			
+			//changed alchemy.js to do this
+			var theNode;
 			if(window.clickedNode){
+				theNode=window.clickedNode;
+			}
+			if(interludeLinks[theNode]){
 				document.getElementById('alchemy').style.display="none";
 				var obj = document.getElementById('activitySpace');
 				obj.style.display="block";
-				obj.src = links[window.clickedNode];
+				if(interludeLinks[theNode].indexOf("www.youtube.com")>-1){
+					interludeLinks[theNode]=interludeLinks[theNode].replace("watch?v=", "embed/");
+				}
+				obj.src = interludeLinks[theNode];			
 				document.getElementById('curLevel').style.display="block";
 				var img = document.getElementById('actImage');
-				img.src=iconLinks[window.clickedNode];
+				img.src=iconLinks[theNode];
 				if(img.src==""){
 					img.style.height="0px";
 				}
 				for(a of fetchedGameMapData.nodes){
-					if(parseInt(a.id)==window.clickedNode){
+					if(parseInt(a.id)==theNode){
 						document.getElementById('imgText').textContent=a.name;
 						break;
 					}
 				}
+				setTimeout(skipScene, 60000);
+			}
+			else{
+				skipScene();
 			}
 		},
 		nodeCaption: function(node){ 
@@ -74,7 +90,7 @@
 
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
-	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
+	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link, gameactivity.topic_id, activity.max_score from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
 	if(rs.next()==false){
@@ -99,12 +115,16 @@
 				"id" : "<%out.print(rs.getInt(1));%>",
 				"name" : "<%out.print(rs.getString(2));%>"
 			});
-			links[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(3));%>";
+			links[parseInt("<%out.print(rs.getInt(1));%>")] = '<%out.print(rs.getString(3)+"?k="+rs.getString(5));%>';
+			if(links[parseInt("<%out.print(rs.getInt(1));%>")].length[links[parseInt("<%out.print(rs.getInt(1));%>")].length-1]=="/"){
+				links[parseInt("<%out.print(rs.getInt(1));%>")].slice(0, links[parseInt("<%out.print(rs.getInt(1));%>")].length-1);
+			}
 			iconLinks[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(4));%>";
+			maxScores[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(6));%>";
 			<%
 			f=rs.next();
 		}
-		st = con.prepareStatement("select activity_id_1, activity_id_2, story_scene.name from path, game, story_scene where game.id=? and story_scene.id=story_scene_id");	//nodes
+		st = con.prepareStatement("select activity_id_1, activity_id_2, story_scene.name, story_scene.link from path, game, story_scene where game.id=? and path.game_id=game.id and story_scene.id=story_scene_id");	//nodes
 		st.setInt(1, Integer.parseInt(request.getParameter("id")));
 		rs=st.executeQuery();
 		while(rs.next()){%>
@@ -113,6 +133,7 @@
 				"target" : "<%out.print(rs.getInt(2));%>",
 				"caption" : "<%out.print(rs.getString(3));%>"
 			});
+			interludeLinks["<%out.print(rs.getInt(2));%>"]="<%out.print(rs.getString(4));%>";
 		<%}%>
 		var alchemy = new Alchemy(config);
 		var alchemyDiv = document.getElementById('alchemy');
@@ -122,7 +143,7 @@
 		document.getElementById('activitySpace').style.display="none";
 
 		window.addEventListener('message', function(evt) {
-			scoreObject.score = evt.data;
+			scoreObject = evt.data;
 			var userID = "<%out.print(session.getAttribute("id"));%>";
 			var userType = "<%out.print(session.getAttribute("type"));%>";
 
@@ -135,13 +156,15 @@
 					"rhs" : ["<%out.print(request.getParameter("id"));%>", window.clickedNode]  
 				});
 			}
-			if(confirm("Game over! You scored "+evt.data+"!\nRetry?")){
-				var actSpace = document.getElementById('activitySpace');
-				//refresh
-				actSpace.src = actSpace.src;
-			}		
-			else{
-				showMap();
+			if(scoreObject.GAMEOVER || scoreObject.SCORE>=maxScores[window.clickedNode]){
+				if(confirm("Game over! You scored "+Math.min(scoreObject.SCORE, maxScores[window.clickedNode])+"!\nRetry?")){
+					var actSpace = document.getElementById('activitySpace');
+					//refresh
+					actSpace.src = actSpace.src;
+				}		
+				else{
+					showMap();
+				}
 			}
 		});
 		function showMap(){
@@ -195,11 +218,36 @@
     			});
 			}
 		}
+
+		function skipScene(){
+			var theNode;
+			if(window.clickedNode){
+				theNode=window.clickedNode;
+			}
+
+			document.getElementById('alchemy').style.display="none";
+			var obj = document.getElementById('activitySpace');
+			obj.style.display="block";
+			obj.src = links[theNode];
+			document.getElementById('curLevel').style.display="block";
+			var img = document.getElementById('actImage');
+			img.src=iconLinks[theNode];
+			if(img.src==""){
+				img.style.height="0px";
+			}
+			for(a of fetchedGameMapData.nodes){
+				if(parseInt(a.id)==theNode){
+					document.getElementById('imgText').textContent=a.name;
+					break;
+				}
+			}
+		}
+
 		</script>
 		<div style="margin-left: 20vw">
 			<ul class="nav nav-pills">
 			    <li><a href="index.jsp">Home</a></li>
-			    <li><a href="#">Dummy</a></li>
+			    <li><a href="#" onclick="skipScene()">Skip Scene</a></li>
 			</ul>
 		</div>
 		<div class="sidenav">

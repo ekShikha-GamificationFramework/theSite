@@ -37,7 +37,6 @@ create table activity (
 	program_link varchar(256) not null,
 	class int(3) not null,
 	max_score int not null,
-	topic_id int(10) not null,
 	creation_date date not null ,
 	level varchar(20)
 ) auto_increment=0;
@@ -53,7 +52,8 @@ create table game(
 create table gameActivity(
 	game_id int(10) unsigned not null,
 	activity_id int(10) unsigned not null,
-	pair_id int(10) auto_increment primary key
+	pair_id int(10) auto_increment primary key,
+	topic_id int(10) not null
 ) auto_increment=0;
 
 create table topic(
