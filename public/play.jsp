@@ -32,15 +32,25 @@
 	var maxScores = {};
 	var interludeLinks = {};
 	var scoreObject={};
+	var pairIDs = {};
+	var timeOut;
+	var gameScore = 0;
 
 	var config = {
 		dataSource: fetchedGameMapData,
-		forceLocked: true,     
-		linkDistancefn: function(){ return 75; },
+		forceLocked: true,
+		initialScale : 0.6, 
+		linkDistancefn: function(e, k){ return 10; },
 		directedEdges : true,
+		edgeStyle: {
+		    "all": {
+		      "color": "#EEE",
+		      "opacity": 1
+			}
+		},
 		nodeStyle : {
 			"all" : {
-				"radius" :20
+				"radius" :15
 			}
 		},
 		nodeClick : function(){
@@ -70,7 +80,7 @@
 						break;
 					}
 				}
-				setTimeout(skipScene, 60000);
+				timeOut=setTimeout(skipScene, 60000);
 			}
 			else{
 				skipScene();
@@ -90,7 +100,7 @@
 
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
-	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link, gameactivity.topic_id, activity.max_score from gameactivity, activity where gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
+	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link, gameactivity.topic_id, activity.max_score, pair_id, topic.name from gameactivity, activity, topic where topic.id=topic_id and gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
 	if(rs.next()==false){
@@ -112,36 +122,45 @@
 		Boolean f = true;
 		while(f){%>
 			fetchedGameMapData.nodes.push({
-				"id" : "<%out.print(rs.getInt(1));%>",
-				"name" : "<%out.print(rs.getString(2));%>"
+				"id" : '<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>',
+				"name" : '<%out.print(rs.getString(2)+" : "+rs.getString(8));%>'
 			});
-			links[parseInt("<%out.print(rs.getInt(1));%>")] = '<%out.print(rs.getString(3)+"?k="+rs.getString(5));%>';
-			if(links[parseInt("<%out.print(rs.getInt(1));%>")].length[links[parseInt("<%out.print(rs.getInt(1));%>")].length-1]=="/"){
-				links[parseInt("<%out.print(rs.getInt(1));%>")].slice(0, links[parseInt("<%out.print(rs.getInt(1));%>")].length-1);
+			links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = '<%out.print(rs.getString(3)+"?k="+rs.getString(5));%>';
+			if(links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].length[links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].length-1]=="/"){
+				links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].slice(0, links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].length-1);
 			}
-			iconLinks[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(4));%>";
-			maxScores[parseInt("<%out.print(rs.getInt(1));%>")] = "<%out.print(rs.getString(6));%>";
+			iconLinks[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = "<%out.print(rs.getString(4));%>";
+			maxScores[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = "<%out.print(rs.getString(6));%>";
+			pairIDs['<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>'] = "<%out.print(rs.getString(7));%>";
 			<%
 			f=rs.next();
 		}
-		st = con.prepareStatement("select activity_id_1, activity_id_2, story_scene.name, story_scene.link from path, game, story_scene where game.id=? and path.game_id=game.id and story_scene.id=story_scene_id");	//nodes
+		st = con.prepareStatement("select activity_id_1, activity_id_2 from path, game where game.id=? and path.game_id=game.id");	//nodes
 		st.setInt(1, Integer.parseInt(request.getParameter("id")));
 		rs=st.executeQuery();
 		while(rs.next()){%>
 			fetchedGameMapData.edges.push({
-				"source" : "<%out.print(rs.getInt(1));%>",
-				"target" : "<%out.print(rs.getInt(2));%>",
-				"caption" : "<%out.print(rs.getString(3));%>"
+				"source" : "<%out.print(rs.getString(1));%>",
+				"target" : "<%out.print(rs.getString(2));%>",
+				"caption" : ""
 			});
-			interludeLinks["<%out.print(rs.getInt(2));%>"]="<%out.print(rs.getString(4));%>";
+		<%}
+		st = con.prepareStatement("select story_scene.name, story_scene.link from path, game, story_scene where game.id=? and path.game_id=game.id and story_scene.id=story_scene_id");	//nodes
+		st.setInt(1, Integer.parseInt(request.getParameter("id")));
+		rs=st.executeQuery();
+		%>var i =0;<%
+		while(rs.next()){%>
+			fetchedGameMapData.edges[i].caption = "<%out.print(rs.getString(1));%>";
+			interludeLinks[fetchedGameMapData.edges[i].target]="<%out.print(rs.getString(2));%>";
+			i++;
 		<%}%>
 		var alchemy = new Alchemy(config);
 		var alchemyDiv = document.getElementById('alchemy');
 		alchemyDiv.style.width = "80vw";
 		alchemyDiv.style.height = "95vh";
 		alchemyDiv.style.marginLeft = "20vw";
+		document.getElementsByTagName('g')[0].transform.baseVal.getItem(0).setTranslate(100,100);
 		document.getElementById('activitySpace').style.display="none";
-
 		window.addEventListener('message', function(evt) {
 			scoreObject = evt.data;
 			var userID = "<%out.print(session.getAttribute("id"));%>";
@@ -151,9 +170,9 @@
 			if(userID!="null" && userType=="s"){
 				sendInfo('gameactivity', 's', getPairID, {
 					"selections" : ['pair_id'],
-					"lhs" : ['game_id', 'activity_id'],
-					"operator" : ['=', '='],
-					"rhs" : ["<%out.print(request.getParameter("id"));%>", window.clickedNode]  
+					"lhs" : ['game_id', 'activity_id', 'topic_id'],
+					"operator" : ['=', '=', "="],
+					"rhs" : ["<%out.print(request.getParameter("id"));%>", parseInt(window.clickedNode.substr(0, window.clickedNode.indexOf("-"))), parseInt(window.clickedNode.substr(window.clickedNode.indexOf("-")+1, window.clickedNode.length))]  
 				});
 			}
 			if(scoreObject.GAMEOVER || scoreObject.SCORE>=maxScores[window.clickedNode]){
@@ -168,16 +187,6 @@
 			}
 		});
 		function showMap(){
-			var myNode = document.getElementById("alchemy");
-			while (myNode.firstChild) {
-			    myNode.removeChild(myNode.firstChild);
-			}
-
-			alchemy = new Alchemy(config);
-			var alchemyDiv = document.getElementById('alchemy');
-			alchemyDiv.style.width = "80vw";
-			alchemyDiv.style.height = "95vh";
-			alchemyDiv.style.marginLeft = "20vw";
 			document.getElementById('activitySpace').style.display='none';
 			document.getElementById('activitySpace').src=""; 
 			document.getElementById('alchemy').style.display='block';
@@ -190,14 +199,20 @@
 	    			sendInfo('stats', 'i', null, {
 	    				"student_id" : "<%out.print(session.getAttribute("id"));%>",
     					"pair_id" : window.curPair,
-    					"score" : scoreObject.score,
-    					"last_played" : new Date().toJSON().slice(0,10)
+    					"score" : scoreObject.SCORE,
+    					"last_score" : scoreObject.SCORE,
+    					"last_played" : new Date().toJSON().slice(0,10),
+    					"times_played" : 1
 	    			});
 	    		} 
 				else{
+					var x = 0;
+					if(scoreObject.GAMEOVER ||scoreObject.SCORE>=maxScores[window.clickedNode]){
+						x=1;
+					}
 					sendInfo("stats", "u", null, {
-						"updates" : ["last_played", "score"],
-						"updateWith" : [new Date().toJSON().slice(0,10), "greatest(score,"+scoreObject.score+")"],
+						"updates" : ["last_played", "score", "last_score", "times_played"],
+						"updateWith" : [new Date().toJSON().slice(0,10), "greatest(score,"+scoreObject.SCORE+")", scoreObject.SCORE, "(times_played)%2B"+x],
 						"lhs" : ["student_id", "pair_id"],
 						"operator" : ["=", "="],
 						"rhs" : ["<%out.print(session.getAttribute("id"));%>", window.curPair]
@@ -220,6 +235,7 @@
 		}
 
 		function skipScene(){
+			clearTimeout(timeOut);
 			var theNode;
 			if(window.clickedNode){
 				theNode=window.clickedNode;

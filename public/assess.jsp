@@ -1,6 +1,6 @@
 <%@ page import ="java.sql.*" %>
 <%
-	if(session.getAttribute("id")==null){
+	if(session.getAttribute("id")==null || session.getAttribute("type").equals("Student")){
 		response.sendRedirect("index.jsp");
 	}
 %>
@@ -56,6 +56,10 @@
 			<input id="studName" list="studs" placeholder="Search a student" onkeypress="searchStudent()"/>
 			<input type="button" class="action-button" value="Get Data" style="margin-bottom: -1vh; margin-top: -0.5vh" onclick="getStudentGameData();"/>
 		</fieldset>
+		<fieldset>
+			<input id="studName" list="studs" placeholder="Search a student" onkeypress="searchStudent()"/>
+			<input type="button" class="action-button" value="Get Data" style="margin-bottom: -1vh; margin-top: -0.5vh" onclick="getStudentGameData();"/>
+		</fieldset>
 	</div>
 </div>
 
@@ -71,9 +75,12 @@
 	function putStudent(){
 		if(request.readyState==4 && request.status == 200){
 			var obj = JSON.parse(request.responseText); 
-			var s = ""; 
+			var s = "", i=0; 
 			for(a of obj){
 				s+="<option value= \""+ a.id +"\">" + a.name+"</option>";
+				i++;
+				if(i>=10)
+					break;
 			}
 			document.getElementById("studs").innerHTML=s;
 		}
@@ -93,7 +100,7 @@
 	function getStudentActivityData(){
 		var studID = document.getElementById('studName').value;
 		sendInfo("gameactivity, stats, activity", "s", putStudentActivityData, {
-			"selections" : ["activity.name", "stats.score", "activity.class", "stats.last_played"],
+			"selections" : ["activity.name", "sum(stats.score)", "activity.class", "max(stats.last_played)"],
 			"lhs" : ["gameactivity.pair_id", "stats.student_id", "activity.id"],
 			"operator" : ["=", "=", "="],
 			"rhs" : ["(stats.pair_id)", studID, "(gameactivity.activity_id)"],
@@ -175,8 +182,8 @@
 
 					cells[0].innerHTML = "<b>"+a["activity.name"]+"</b>";
 					cells[1].innerHTML = a["activity.class"];
-					cells[2].innerHTML = a["stats.score"];
-					cells[3].innerHTML = a["stats.last_played"];
+					cells[2].innerHTML = a["sum(stats.score)"];
+					cells[3].innerHTML = a["max(stats.last_played)"];
 				}
 				activityList.appendChild(table);
 			}

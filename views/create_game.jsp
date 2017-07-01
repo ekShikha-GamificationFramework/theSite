@@ -17,7 +17,7 @@
 	}
 </script>
 
-<div class="alchemy" id="alchemy" style="height:70vh; width:80vw"></div>
+<div class="alchemy" id="alchemy" style="height:85vh; width:75vw; margin-left: -4vw"></div>
 
 <%
 	// ---------------->>>>>>>>>>>>> USE AJAX HERE !!!!!!!!  <<<<<<<<<<<<<<<-----------------
@@ -45,11 +45,14 @@
 	document.getElementById("middle").style.marginLeft = "250px";
 	var config = {
 		dataSource: gameMapData,
-		forceLocked: false,     
-		linkDistance: function(){ return 25; },
+		forceLocked: false, 
+		directedEdges : true,  
+		initialScale : 0.6,
+		zoomControls : true,  
+		linkDistancefn: function(e, k){ return 10; },
 		nodeStyle : {
 			"all" : {
-				"radius" :20
+				"radius" :15
 			}
 		},
 		nodeCaption: function(node){ 
@@ -418,10 +421,12 @@ rs.next();
     	var act2 = document.getElementById('sel2').value;
 
     	if(act1 != act2){
+    		var x=document.getElementById('sel3').selectedOptions[0];
+
 	    	gameMapData.edges.push({
-	    		"source" : parseInt(act1),
-	    		"target" : parseInt(act2),
-	    		"caption" : document.getElementById('sel3').selectedOptions[0].innerText
+	    		"source" : act1,
+	    		"target" : (act2),
+	    		"caption" : ""+ (x?x.innerText:"")
 	    	});
 	    	
 	    	//couldn't figure out how to add new nodes dynamically
@@ -432,11 +437,16 @@ rs.next();
 			}
 
 			alchemy = new Alchemy(config);
+			var alchemyDiv = document.getElementById('alchemy');
+			alchemyDiv.style.width = "75vw";
+			alchemyDiv.style.height = "85vh";
+			alchemyDiv.style.marginLeft = "-4vw";
+			document.getElementsByTagName('g')[0].transform.baseVal.getItem(0).setTranslate(100,100);
 
 			path.push({
-				"act1" : parseInt(act1),
-				"act2" : parseInt(act2),
-				"scene" : parseInt(document.getElementById('sel3').selectedOptions[0].value),
+				"act1" :act1,
+				"act2" : act2,
+				"scene" : (x?x.value:-1),
 				"score" : parseInt(document.getElementById('sugScore').value)
 			});
     	}  
@@ -454,8 +464,8 @@ rs.next();
 				"class" : obj.class,
 				"max_score" : obj.max_score,
 				// "topic_id" : obj.topic_id,
-				"creation_date" : obj.creation_date,
-				"level" : obj.level
+				"creation_date" : obj.creation_date
+				//"level" : obj.level
 			});
 
 			sendInfo("gameactivity", "i", null, {
@@ -469,7 +479,7 @@ rs.next();
     	for(obj of existingActivities){
     		sendInfo("gameactivity", "i", null, {
     			"game_id" : curGameID,
-    			"activity_id":obj.id,
+    			"activity_id" : parseInt(obj.id.substr(0, obj.id.indexOf("-"))),
     			"topic_id" : obj.topic_id
     		});
     	}
@@ -562,8 +572,8 @@ rs.next();
 					var a = document.createElement("option");
 			    	var b = document.createElement("option");
 
-			    	a.text=b.text=document.getElementById("actSelect").selectedOptions[0].text;
-			    	a.value=b.value=document.getElementById("actSelect").value;
+			    	a.text=b.text=document.getElementById("actSelect").selectedOptions[0].text+"-"+theTopicID;
+			    	a.value=b.value=document.getElementById("actSelect").value+"-"+theTopicID;
 
 			    	existingActivities.push({
 			    		"id" : a.value,
@@ -574,7 +584,7 @@ rs.next();
 			    	document.getElementById("sel2").appendChild(b);
 
 			    	gameMapData.nodes.push({
-			    		"id" : a.value+"-"+theTopicID,
+			    		"id" : a.value,
 			    		"name" : a.text
 			    	});
 
@@ -584,6 +594,11 @@ rs.next();
 					}
 
 					alchemy = new Alchemy(config);
+					var alchemyDiv = document.getElementById('alchemy');
+					alchemyDiv.style.width = "75vw";
+					alchemyDiv.style.height = "85vh";
+					alchemyDiv.style.marginLeft = "-4vw";
+					document.getElementsByTagName('g')[0].transform.baseVal.getItem(0).setTranslate(100,100);
 				}
 				else{
 					var c = document.getElementById("theName").value;
@@ -596,12 +611,12 @@ rs.next();
 			    		alert("Don't leave it empty!");
 			    		return;
 			    	}
-
+			    	document.getElementById('actSelect').innerHTML+="<option value='"+newActivityID+"'>"+c+"-"+theTopicID+"</option>";
 			    	var a = document.createElement("option");
 			    	var b = document.createElement("option");
 
 			    	a.text=b.text=c;
-			    	a.value=b.value=newActivityID;
+			    	a.value=b.value=newActivityID+"-"+theTopicID;
 
 			    	document.getElementById("sel1").appendChild(a);
 			    	document.getElementById("sel2").appendChild(b);
@@ -619,7 +634,8 @@ rs.next();
 						"max_score" : e,
 						"creation_date" : new Date().toJSON().slice(0,10),
 						"id" : newActivityID,
-						"level" : document.getElementById('taxonomyLevel').value
+						"topic_id" : theTopicID
+						//"level" : document.getElementById('taxonomyLevel').value
 					});
 
 					newActivityID++;
@@ -629,6 +645,11 @@ rs.next();
 					}
 
 					alchemy = new Alchemy(config);
+					var alchemyDiv = document.getElementById('alchemy');
+					alchemyDiv.style.width = "75vw";
+					alchemyDiv.style.height = "85vh";
+					alchemyDiv.style.marginLeft = "-4vw";
+					document.getElementsByTagName('g')[0].transform.baseVal.getItem(0).setTranslate(100,100);
 
 					document.getElementById("theName").value="";
 					document.getElementById("theClass").value="";

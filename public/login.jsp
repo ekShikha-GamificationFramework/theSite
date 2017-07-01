@@ -66,7 +66,7 @@
 							<jsp:param name="title" value="Login" />
 						</jsp:include>
 						<jsp:include page = "../views/apology.jsp" flush = "true" >
-							<jsp:param name="message" value="Wrong passwords!" />
+							<jsp:param name="message" value="Wrong password!" />
 						</jsp:include>	
 						<jsp:include page = "../views/footer.jsp" flush = "true"/>
 					<%

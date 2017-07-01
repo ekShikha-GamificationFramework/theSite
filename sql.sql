@@ -69,8 +69,8 @@ create table stats(
 );
 
 create table path (
-	activity_id_1 int(10) not null,
-	activity_id_2 int(10) not null,
+	activity_id_1 varchar(50) not null,
+	activity_id_2 varchar(50) not null,
 	story_scene_id int(10) not null,
 	score int(5),
 	game_id int(10)
@@ -81,3 +81,8 @@ create table story_scene(
 	name varchar(50) not null,
 	link varchar(256)
 ) auto_increment=0;
+
+
+-- >>>>>>>> CHANGES <<<<<<<-----
+alter table stats
+add column times_played int default 0;
