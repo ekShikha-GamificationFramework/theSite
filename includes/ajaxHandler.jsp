@@ -54,6 +54,7 @@ else if(request.getParameter("type").equals("s")){
 	if(request.getParameter("extra")!=null){
 		x+=request.getParameter("extra");
 	}
+	
 	st = con.prepareStatement(s1.substring(0, s1.length()-1) + s2.substring(0, s2.length()-4) + x);
 	ResultSet rs = st.executeQuery();
 

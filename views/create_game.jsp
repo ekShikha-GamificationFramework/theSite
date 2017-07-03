@@ -5,7 +5,9 @@
 <script src="../public/js/d3.v3.min.js"></script>
 <script src="../public/js/alchemy.js"></script>
 <script src="../public/js/vendor.js"></script>
+<script type="text/javascript" src="../public/js/loader.js"></script>
 <script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
 	//hide obs1
 	function switchDisplay(obs1, obs2){
 		for(a of obs1){
@@ -23,13 +25,8 @@
 	// ---------------->>>>>>>>>>>>> USE AJAX HERE !!!!!!!!  <<<<<<<<<<<<<<<-----------------
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
-	PreparedStatement st = con.prepareStatement("select id, name from activity");
-	ResultSet rs=st.executeQuery();
-	String s="";
-	while(rs.next()){
-		s+="<option value="+ rs.getString(1)+">"+ rs.getString(2) +"</option>";
-	}
-	
+	PreparedStatement st;
+	ResultSet rs;	
 %>
 
 <script type="text/javascript">
@@ -37,6 +34,7 @@
 	var existingActivities=[];
 	var scenes=[];
 	var path = [];
+	var catMarks = {};
 	var gameMapData = {
 		"nodes": [],
 		"edges": []
@@ -50,6 +48,12 @@
 		initialScale : 0.6,
 		zoomControls : true,  
 		linkDistancefn: function(e, k){ return 10; },
+		edgeStyle: {
+		    "all": {
+		      "color": "#EEE",
+		      "opacity": 1
+			}
+		},
 		nodeStyle : {
 			"all" : {
 				"radius" :15
@@ -66,99 +70,36 @@
 </script>
 
 <div class="sidenav">
-	<!-- <ul id="progressbar">
-	    <li class="active">Choose Activity</li>
-	    <li>Choose Scene</li>
-	    <li>Connect</li>
-	    <li>Gamify!</li>
-	</ul>
-	<div class="form-group">
-		<div id="act">
-			<div id = "actChoose" class="gamifyDiv">
-				<button class="btn btn-default" >Create new activity</button><br><span>or<br><a href="#">Choose from existing ones</a></span>
-			</div>
-			<div id="newActivityDiv" class="gamifyDiv">
-				<span>Is this the starting activity?</span><input type="checkbox" name="root" style="color: white" /><br>
-				<input class="form-control" type="text" id="theName" placeholder="Activity Name"/>
-				<input class="form-control" type="text" id="theClass" placeholder="Class"/>
-				<input class="form-control" type="text" id="theScore" placeholder="Maximum Score"/>
-				<select id="taxonomyLevel" name="level" class="form-control" style="width: 80%">
-					<option>Recall</option>
-					<option>Apply</option>
-					<option>Analyze</option>
-				</select>
-				<input class="form-control" type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
-				<input class="form-control" type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
-				<input class="form-control" id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic()"	/>
-				<button class="btn btn-default" onclick="activityAdder()" style="margin-top:10px; margin-bottom:10px">
-	        	Add activity
-	    	</button>
-				
-			</div>
-
-			<div id="existingActivityDiv" class="gamifyDiv">
-				<select class="form-control" id="actSelect"><%out.print(s);%></select>
-			</div>
-    	</div>
-			
-		<div id="sceneDiv" class="gamifyDiv">	    
-		    <input class="form-control" type="text" id="sceneName" placeholder="Scene Name"/>
-		    <input class="form-control" type="text" placeholder="Scene Link" id="sceneMedia"/>
-			<button class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
-		        Add scene
-		    </button>
-	    </div>
-
-	    <div id="pathDiv" class="gamifyDiv">	
-			<span style="color:white">Activity #1</span>
-		    <select class="form-control" id="sel1">
-		    	<% out.println(s); %>
-		    </select>
-
-		    <br>
-		    
-		    <span style="color:white">Activity #2</span>
-		    <select class="form-control" id="sel2">
-		    	<% out.println(s); %>
-		    </select>
-		    
-		    <br>
-		    
-		    <span style="color:white">Connecting Scene</span>
-		    <select id="sel3" class="form-control">
-		    	<%
-		    	st=con.prepareStatement("select id, name from story_scene");
-		    	rs=st.executeQuery();
-		    	while(rs.next()){
-		    		out.println("<option value="+rs.getInt(1)+">"+rs.getString(2)+"</option>");
-		    	}
-		    	%>
-		    </select>
-	    
-		    <button class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
-		        Connect
-		    </button>
-	    </div>
-	    <div id="gameDiv" class="gamifyDiv">
-		    <input class="form-control" type="text" id="gameName" placeholder="Name your Game!"/>
-		    <input class="form-control" type="text" id="gameLink" placeholder="Provide Icon Link"/>
-		    <button class="btn btn-default" onclick="gameUploader();" style="margin-top:10px; margin-bottom:10px">
-		        Create Game
-		    </button>
-		</div>
-    </div> -->
-    <!-- multistep form -->
 
 
 <div id="msform">
 	<!-- progressbar -->
 	<ul id="progressbar">
-		<li class="active">Activities</li>
-		<li>Scenes</li>
+		<li class="active">Categories</li>
+		<li>Activities</li>
+		<li>Contribution</li>
 		<li>Paths</li>
 		<li>Gamify!</li>
 	</ul>
 	<!-- fieldsets -->
+	<fieldset>
+		<h5><b>Choose categories for the game</b></h5>
+		<select class="form-control" id="theCat">
+			<%
+			st = con.prepareStatement("select id, name from category");
+			rs=st.executeQuery();
+			String s="";
+			while(rs.next()){
+				s+="<option value="+ rs.getString(1)+">"+ rs.getString(2) +"</option>";
+			}
+			out.print(s);
+			%>
+		</select>
+		<input type="text" id="catScore" placeholder="Max Category Score"/>
+		<button type="button" class="btn btn-default" onclick="addCategory()">Add Category</button>
+		<br>
+		<input type="button" name="next" class="next action-button" value="Next" />
+	</fieldset>
 	<fieldset>
 		<div id="actChoose">
 			<h2 class="fs-title">Choose</h2>
@@ -168,8 +109,8 @@
 		</div>
 		<div id="newActivityDiv" style="display:none">
 			<input type="text" id="theName" placeholder="Activity Name"/>
-			<input type="text" id="theClass" placeholder="Class"/>
-			<input type="text" id="theScore" placeholder="Maximum Score"/>
+			<!-- <input type="text" id="theClass" placeholder="Class"/> -->
+			
 			<!-- <select class="form-control" id="taxonomyLevel" name="level" id="theLevel" style="margin-bottom: 10px; width:100%">
 
 				<option>Recall</option>
@@ -178,30 +119,50 @@
 			</select> -->
 			<input type="text" id="theIcon" placeholder="Icon Link" id="iconFile"/>
 			<input type="text" id="theLink" placeholder="Activity Link" id="activityFile"/>
+			<select class="form-control" id="catSelectN"></select>
+			<br>
 			<input id="theTopics" list="topics" placeholder="Topic" onkeypress="searchTopic('')"/>
+			<!-- <input type="text" id="theScore" placeholder="Maximum Score"/> -->
 			<button type="button" class="btn btn-default" onclick="activityAdder('new')">
         	Add activity
     		</button>
 		</div>
+		<%
+		st = con.prepareStatement("select id, name from activity");
+		rs=st.executeQuery();
+		s="";
+		while(rs.next()){
+			s+="<option value="+ rs.getString(1)+">"+ rs.getString(2) +"</option>";
+		}
+		%>
 		<div id="existingActivityDiv" style="display:none">
 			<select class="form-control" id="actSelect"><%out.print(s);%></select>
+			<br>
+			<select class="form-control" id="catSelectE"></select>
 			<input id="theTopics1" list="topics" placeholder="Topic" onkeypress="searchTopic('1')"/>
+			<!-- <input type="text" id="theScoreE" placeholder="Maximum Score"/> -->
 			<br>
 			<button type="button" class="btn btn-default" onclick="activityAdder('exis')" style="margin-top:10px; margin-bottom:10px">
         	Add activity
     		</button>
 		</div>
 		<h3 id="back1" class="fs-subtitle" style="display: none" onclick="switchDisplay(['existingActivityDiv', 'newActivityDiv', 'back1'], ['actChoose'])"><a href="#">Back</a></h3>
+		<input type="button" name="previous" class="previous action-button" value="Previous" />
 		<input type="button" name="next" class="next action-button" value="Next" />
 	</fieldset>
 	<fieldset>
-		<div id="sceneDiv">	    
+		<!-- <div id="sceneDiv">	    
 		    <input type="text" id="sceneName" placeholder="Scene Name"/>
 		    <input type="text" placeholder="Scene Link" id="sceneMedia"/>
 			<button type="button" class="btn btn-default" onclick="sceneAdder()" style="margin-top:10px; margin-bottom:10px">
 		        Add scene
 		    </button>
+	    </div> -->
+
+	    <div class="panel-group" id="contriDiv">
+	    	
 	    </div>
+
 	    <input type="button" name="previous" class="previous action-button" value="Previous" />
 	    <input type="button" name="next" class="next action-button" value="Next" />
 	</fieldset>
@@ -212,14 +173,14 @@
 		    Activity #2 : 
 		    <select class="form-control" id="sel2"></select>
 		    <br>		    
-		    Connecting Scene : 
-		    <select id="sel3" class="form-control"></select>
-	    	<input type="text" id="sugScore" placeholder="Suggested Score" />
+		    <input type="text" id="sceneName" placeholder="Scene Name"/>
+		    <input type="text" placeholder="Scene Link" id="sceneMedia"/>
+	    	<!-- <input type="text" id="sugScore" placeholder="Suggested Score" /> -->
 		    <button type="button" class="btn btn-default" onclick="activityConnector()" style="margin-top:10px; margin-bottom:10px">
 		        Connect
 		    </button>
 		</div>
-		 <input type="button" name="previous" class="previous action-button" value="Previous" />
+		<input type="button" name="previous" class="previous action-button" value="Previous" />
 	    <input type="button" name="next" class="next action-button" value="Next" />
 	</fieldset>
 	<fieldset>
@@ -367,6 +328,8 @@ rs.next();
 
 %>
 
+<datalist id="category"></datalist>
+
 <script type="text/javascript">
 	//add this to script.js
 	//or maybe not
@@ -382,38 +345,32 @@ rs.next();
 	    		"operator" : ["="],
 	    		"rhs" : [document.getElementById("theTopics1").value] 
 	    	});
-
-    		return;
-    	}
-
-    	
-    	sendInfo("topic", "s", getTopicID, {
-    		"selections" : ["id"],
-    		"lhs" : ["name"],
-    		"operator" : ["="],
-    		"rhs" : [document.getElementById("theTopics").value] 
-    	});
+	    }
+	    else{
+	    	sendInfo("topic", "s", getTopicID, {
+	    		"selections" : ["id"],
+	    		"lhs" : ["name"],
+	    		"operator" : ["="],
+	    		"rhs" : [document.getElementById("theTopics").value] 
+	    	});
+	    }
     }
 
-    function sceneAdder(){
-    	var b = document.getElementById("sceneMedia").value;
-    	var c = document.getElementById("sceneName").value;
-    	if(b=="" || c==""){
-    		alert("Don't leave it empty!");
-    		return;
-    	}
-    	var a = document.createElement("option");
-    	a.value=newSceneID;
-    	a.text=c;
-    	document.getElementById("sel3").appendChild(a);
+    // function sceneAdder(){
+    // 	var b = document.getElementById("sceneMedia").value;
+    // 	var c = document.getElementById("sceneName").value;
+    // 	if(b=="" || c==""){
+    // 		alert("Don't leave it empty!");
+    // 		return;
+    // 	}
 
-    	scenes.push({"name" : c, "link": b, "id" : newSceneID});
+    // 	scenes.push({"name" : c, "link": b, "id" : newSceneID});
    
-    	newSceneID++;
+    // 	newSceneID++;
 
-    	document.getElementById("sceneMedia").value="";
-    	document.getElementById("sceneName").value="";
-    }
+    // 	document.getElementById("sceneMedia").value="";
+    // 	document.getElementById("sceneName").value="";
+    // }
 
     function activityConnector(){
 
@@ -421,12 +378,21 @@ rs.next();
     	var act2 = document.getElementById('sel2').value;
 
     	if(act1 != act2){
-    		var x=document.getElementById('sel3').selectedOptions[0];
+
+	    	var b = document.getElementById("sceneMedia").value;
+	    	var c = document.getElementById("sceneName").value;
+	    	if(!(b=="" || c=="")){
+	    		scenes.push({"name" : c, "link": b, "id" : newSceneID});
+	    		newSceneID++;
+	    	}
+
+	    	document.getElementById("sceneMedia").value="";
+	    	document.getElementById("sceneName").value="";
 
 	    	gameMapData.edges.push({
 	    		"source" : act1,
 	    		"target" : (act2),
-	    		"caption" : ""+ (x?x.innerText:"")
+	    		"caption" : c
 	    	});
 	    	
 	    	//couldn't figure out how to add new nodes dynamically
@@ -446,8 +412,8 @@ rs.next();
 			path.push({
 				"act1" :act1,
 				"act2" : act2,
-				"scene" : (x?x.value:-1),
-				"score" : parseInt(document.getElementById('sugScore').value)
+				"scene" : !(b=="" || c=="") ? newSceneID-1 : -1
+				//"score" : parseInt(document.getElementById('sugScore').value)
 			});
     	}  
     	else{
@@ -461,8 +427,8 @@ rs.next();
 				"name" : obj.name,
 				"icon_link" : obj.icon_link,
 				"program_link" : obj.program_link, 
-				"class" : obj.class,
-				"max_score" : obj.max_score,
+				//"class" : obj.class,
+				//"max_score" : obj.max_score,
 				// "topic_id" : obj.topic_id,
 				"creation_date" : obj.creation_date
 				//"level" : obj.level
@@ -470,8 +436,11 @@ rs.next();
 
 			sendInfo("gameactivity", "i", null, {
 				"game_id" : curGameID,
-				"activity_id" : obj.id,
-				"topic_id" : obj.topic_id
+				"activity_id" : parseInt(obj.id.substr(0, obj.id.indexOf("-"))),
+				"topic_id" : obj.topic_id,
+				//"max_score" : catMarks[obj.category_id],
+				"category_id" : obj.category_id,
+				"contri" : contriMarks[obj.id]
 			});
     	}
     	activities=[];
@@ -480,7 +449,10 @@ rs.next();
     		sendInfo("gameactivity", "i", null, {
     			"game_id" : curGameID,
     			"activity_id" : parseInt(obj.id.substr(0, obj.id.indexOf("-"))),
-    			"topic_id" : obj.topic_id
+    			"topic_id" : obj.topic_id,
+    			"category_id" : obj.category_id,
+				"contri" : contriMarks[obj.id]
+    			//"max_score" : catMarks[obj.category_id]
     		});
     	}
     }
@@ -501,8 +473,8 @@ rs.next();
     			"activity_id_1" : obj.act1,
     			"activity_id_2" : obj.act2,
     			"story_scene_id" : obj.scene,
-    			"game_id" : curGameID,
-    			"score" : obj.score
+    			"game_id" : curGameID
+    			//"score" : obj.score
     		});
     	}
     	path=[];
@@ -523,14 +495,24 @@ rs.next();
     	sceneUploader();
     	pathUploader();
 
+    	for(i in catMarks){
+    		sendInfo("gamecategory", "i", null,{
+    			"game_id" : curGameID,
+    			"category_id" : i,
+    			"max_score" : catMarks[i]
+    		});
+    	}
+
     	sendInfo("game", "i", null, {
     		"name" : document.getElementById("gameName").value,
     		"icon_link": document.getElementById("gameLink").value,
     		"teacher_id" : "<%out.print(session.getAttribute("id"));%>",
     		"creation_date" : new Date().toJSON().slice(0,10)  
     	});
-
-    	window.location.reload();
+    
+    	if(!alert("Game published!")){
+    		window.location.reload();
+    	}
     }
 
 </script>
@@ -572,16 +554,24 @@ rs.next();
 					var a = document.createElement("option");
 			    	var b = document.createElement("option");
 
-			    	a.text=b.text=document.getElementById("actSelect").selectedOptions[0].text+"-"+theTopicID;
-			    	a.value=b.value=document.getElementById("actSelect").value+"-"+theTopicID;
+			    	a.text=b.text=document.getElementById("actSelect").selectedOptions[0].text+"-"+document.getElementById("catSelectE").selectedOptions[0].value+"-"+theTopicID;
+			    	a.value=b.value=document.getElementById("actSelect").value+"-"+document.getElementById("catSelectE").selectedOptions[0].value+"-"+theTopicID;
 
 			    	existingActivities.push({
 			    		"id" : a.value,
-			    		"topic_id" : theTopicID
+			    		"topic_id" : theTopicID,
+			    		"category_id" : document.getElementById("catSelectE").selectedOptions[0].value
+			    		//"max_score" : parseInt(document.getElementById("theScoreE").value)
 			    	});
 
 			    	document.getElementById("sel1").appendChild(a);
 			    	document.getElementById("sel2").appendChild(b);
+
+			    	var accPanel = document.getElementById('class'+document.getElementById("catSelectE").selectedOptions[0].value);
+			    	var panelData = accPanel.innerHTML;
+
+			    	panelData = "<label>"+a.text+"</label> : <input name='"+a.text+"' style='padding: 0px; width:3vw' type='text' id='"+a.value+"'> pts" + panelData; 
+			    	accPanel.innerHTML = panelData;
 
 			    	gameMapData.nodes.push({
 			    		"id" : a.value,
@@ -602,38 +592,46 @@ rs.next();
 				}
 				else{
 					var c = document.getElementById("theName").value;
-			    	var d = document.getElementById("theClass").value;
-			    	var e = document.getElementById("theScore").value;
+			    	// var d = document.getElementById("theClass").value;
+			    	//var e = document.getElementById("theScore").value;
 			    	var f = document.getElementById("theIcon").value;
 			    	var g = document.getElementById("theLink").value;
 
-			    	if(c=="" || d=="" || e=="" || g==""){
+			    	if(c=="" || f=="" || g==""){
 			    		alert("Don't leave it empty!");
 			    		return;
 			    	}
-			    	document.getElementById('actSelect').innerHTML+="<option value='"+newActivityID+"'>"+c+"-"+theTopicID+"</option>";
+			    	document.getElementById('actSelect').innerHTML+="<option value='"+newActivityID+"'>"+c+"</option>";
 			    	var a = document.createElement("option");
 			    	var b = document.createElement("option");
 
-			    	a.text=b.text=c;
-			    	a.value=b.value=newActivityID+"-"+theTopicID;
+			    	a.text=b.text=c+"-"+document.getElementById("catSelectN").selectedOptions[0].value+"-"+theTopicID;
+			    	a.value=b.value=newActivityID+"-"+document.getElementById("catSelectN").selectedOptions[0].value+"-"+theTopicID;
 
 			    	document.getElementById("sel1").appendChild(a);
 			    	document.getElementById("sel2").appendChild(b);
+
+			    	var accPanel = document.getElementById('class'+document.getElementById("catSelectE").selectedOptions[0].value);
+			    	var panelData = accPanel.innerHTML;
+
+			    	panelData = "<label>"+a.text+"</label> : <input style='padding: 0px; width:3vw' type='text' id='"+a.value+"''>" + panelData; 
+			    	accPanel.innerHTML = panelData;
 			    	
 			    	gameMapData.nodes.push({
-			    		"id" : newActivityID+"-"+theTopicID,
-			    		"name" : c
+			    		"id" : newActivityID+"-"+document.getElementById("catSelectN").selectedOptions[0].value+"-"+theTopicID,
+			    		"name" : c+"-"+document.getElementById("catSelectN").selectedOptions[0].value+"-"+theTopicID
 			    	});
 
 			    	activities.push({
+			    		"id" : a.value,
 						"name" : c,
 						"icon_link" : f,
 						"program_link" : g, 
-						"class" : d,
-						"max_score" : e,
+						//"class" : d,
+						//"max_score" : e,
 						"creation_date" : new Date().toJSON().slice(0,10),
 						"id" : newActivityID,
+						"category_id" : document.getElementById("catSelectN").selectedOptions[0].value,
 						"topic_id" : theTopicID
 						//"level" : document.getElementById('taxonomyLevel').value
 					});
@@ -652,8 +650,8 @@ rs.next();
 					document.getElementsByTagName('g')[0].transform.baseVal.getItem(0).setTranslate(100,100);
 
 					document.getElementById("theName").value="";
-					document.getElementById("theClass").value="";
-					document.getElementById("theScore").value="";
+					//document.getElementById("theClass").value="";
+					//document.getElementById("theScore").value="";
 					document.getElementById("theIcon").value="";
 					document.getElementById("theLink").value="";
 				}
@@ -665,5 +663,86 @@ rs.next();
     		"name" : document.getElementById("theTopics"+s).value
     	});
     	theTopicID++;
+    }
+
+    // function searchCategory(){
+    // 	sendInfo("category", "s", putCategory, {
+    // 		"selections" : ['id', 'name'],
+    // 		"lhs" : ['name'],
+    // 		"operator" : ['like'],
+    // 		"rhs" : ['%25'+document.getElementById('theCat').value+'%25']	
+    // 	});
+    // }
+
+	//  function putCategory(){
+	//  	if(request.readyState==4 && request.status == 200){
+	//  		var obj = JSON.parse(request.responseText);
+	//  		var s = "";
+	//  		for(a of obj){
+	//  			s+="<option value= \""+ a.name +"\">" + a.id+"</option>";
+			// }
+			// document.getElementById("category").innerHTML=s;
+	//  	}
+	//  }
+
+	var contriData = {};
+	var contriMarks={};
+	function setContriData(catID) {
+		contriData[catID] = [["Activity", "Contribution"]];
+		var accPanel = document.getElementById('class'+catID);
+		var accInputs = accPanel.getElementsByTagName('input');
+		var total = 0;
+		for(var i=0; i<accInputs.length; i++){
+			contriData[catID].push([accInputs[i].name, parseInt(accInputs[i].value)]);
+			contriMarks[accInputs[i].id] = parseInt(accInputs[i].value);
+			total += parseInt(accInputs[i].value);
+		}
+		if(total!=catMarks[catID]){
+			alert('Please calculate the marks properly.\nThe total needs to be '+catMarks[catID]);
+			return false;
+		}
+		return true;
+	}
+
+	function drawChart(catID){
+		if(!setContriData(catID))
+			return;
+		var options = {
+			legend : 'none',
+			chartArea : {
+				width:'90%',
+				height:'90%'
+			},
+			is3D : true
+		};
+		var data = google.visualization.arrayToDataTable(contriData[catID]);
+		var chart = new google.visualization.PieChart(document.getElementById(catID+'chart'));
+        chart.draw(data, options);
+	}
+
+    function addCategory(){
+    	var a = document.createElement("option");
+    	var b = document.createElement("option");
+    	var cat = document.getElementById('theCat').selectedOptions[0];
+    	catMarks[cat.value] = parseInt(document.getElementById('catScore').value);
+    	a.value=b.value=cat.value;
+    	a.text=b.text=cat.text;
+    	document.getElementById("catSelectE").appendChild(a);
+    	document.getElementById("catSelectN").appendChild(b);
+    	contriData[cat.value] = [];
+    	var accordion = document.getElementById("contriDiv");
+    	var s = "", x = "";
+    	s+='<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">';
+    	s+='<a data-toggle="collapse" data-parent="#contriDiv" href="#'+cat.value+'">';
+    	s+=cat.text +" - "+ catMarks[cat.value]+" pts";
+    	s+='</a></h4></div>';
+    	if(accordion.innerHTML=="")
+    		x="in";
+    	
+    	s+='<div id="'+cat.value+'" class="panel-collapse collapse '+x+'"><div class="panel-body" id="class'+cat.value+'">';
+    	s+='<div id="'+cat.value+'chart"></div>';
+    	s+='<button type="button" class="btn btn-default" onclick="drawChart('+cat.value+')">Set Contribution</button>';
+    	s+='</div></div></div>';
+    	accordion.innerHTML+=s;
     }
 </script>

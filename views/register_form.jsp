@@ -19,7 +19,7 @@
             <input class="form-control" name="email" placeholder="E-mail" type="email"/>
         </div>
         <div class="form-group">
-            <input class="form-control" list="schools" name="school" id="school" placeholder="School" type="text" onchange="searchSchool()" /><br>
+            <input class="form-control" list="schools" name="school" id="school" placeholder="School" type="text" onkeypress="searchSchool()" /><br>
             <input class="form-control" name="schoolcity" placeholder="School City" type="text"/><br>
             <input class="form-control" name="schoolstate" placeholder="School State" type="text"/>
         </div>

@@ -100,7 +100,7 @@
 
 	Class.forName("com.mysql.jdbc.Driver"); 
 	java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gamification","archit","archit123");
-	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link, gameactivity.topic_id, activity.max_score, pair_id, topic.name from gameactivity, activity, topic where topic.id=topic_id and gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
+	PreparedStatement st = con.prepareStatement("select activity_id, activity.name, activity.program_link, activity.icon_link, gameactivity.topic_id, pair_id, topic.name, category_id from gameactivity, activity, topic, category where category.id=category_id and topic.id=topic_id and gameactivity.game_id=? and activity.id=gameactivity.activity_id");	//nodes
 	st.setInt(1, Integer.parseInt(request.getParameter("id")));
 	ResultSet rs=st.executeQuery();
 	if(rs.next()==false){
@@ -122,16 +122,16 @@
 		Boolean f = true;
 		while(f){%>
 			fetchedGameMapData.nodes.push({
-				"id" : '<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>',
-				"name" : '<%out.print(rs.getString(2)+" : "+rs.getString(8));%>'
+				"id" : '<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>',
+				"name" : '<%out.print(rs.getString(2)+" : "+rs.getString(7));%>'
 			});
-			links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = '<%out.print(rs.getString(3)+"?k="+rs.getString(5));%>';
-			if(links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].length[links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].length-1]=="/"){
-				links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].slice(0, links[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')].length-1);
+			links[('<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>')] = '<%out.print(rs.getString(3)+"?k="+rs.getString(5));%>';
+			if(links[('<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>')].length[links[('<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>')].length-1]=="/"){
+				links[('<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>')].slice(0, links[('<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>')].length-1);
 			}
-			iconLinks[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = "<%out.print(rs.getString(4));%>";
-			maxScores[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = "<%out.print(rs.getString(6));%>";
-			pairIDs['<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>'] = "<%out.print(rs.getString(7));%>";
+			iconLinks[('<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>')] = "<%out.print(rs.getString(4));%>";
+			// maxScores[('<%out.print(rs.getInt(1)+"-"+rs.getString(5));%>')] = "<%out.print(rs.getString(6));%>";
+			pairIDs['<%out.print(rs.getInt(1)+"-"+rs.getString(8)+"-"+rs.getString(5));%>'] = "<%out.print(rs.getString(6));%>";
 			<%
 			f=rs.next();
 		}

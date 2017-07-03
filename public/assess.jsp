@@ -34,8 +34,18 @@
 	<button class="tablinks" onclick="showData(event, 'taxo'); getStudentTaxonomyData();">Taxonomy-Wise</button>
 </div>
 
+<script type="text/javascript" src="../public/js/loader.js"></script>
+
 <div id="game" class="tabcontent" style="display: block">
-<h3><b>Nothing yet.</b></h3>
+	<table id="gamesTable" class="table table-striped">
+		<thead>
+			<tr>
+				<td>Game</td>
+				<td>Category Completion</td>
+				<td>Score Breakdown</td>
+			</tr>
+		</thead>
+	</table>
 </div>
 
 <div id="act" class="tabcontent">
@@ -64,6 +74,7 @@
 </div>
 
 <script type="text/javascript">
+google.charts.load('current', {'packages':['corechart']});
 	function searchStudent() {
 		sendInfo("student", "s", putStudent, {
     		"selections" : ["name", "id"],
@@ -88,13 +99,13 @@
 
 	function getStudentGameData(){
 		var studID = document.getElementById('studName').value;
-		sendInfo("gameactivity, stats, game", "s", putStudentGameData, {
-			"selections" : ["game.name", "icon_link", "sum(score)", "max(last_played)", "game_id"],
-			"lhs" : ["gameactivity.pair_id", "stats.student_id", "game_id"],
-			"operator" : ["=", "=", "="],
-			"rhs" : ["(stats.pair_id)", studID, "(id)"],
-			"extra" : "group by id"
-		});		
+		sendInfo("gameactivity, gamecategory, category, stats, game", "s", putStudentGameData, {
+			"selections" : ["category.name", "max_score", "sum(score)", "game.icon_link", "game.id"],
+			"lhs" : ["stats.pair_id", "gamecategory.game_id", "gamecategory.category_id", "gamecategory.category_id", "gamecategory.game_id", "student_id"],
+			"operator" : ["=", "=", "=", "=", "=", "="],
+			"rhs" : ["(gameactivity.pair_id)","(game.id)", "(category.id)", "(gameactivity.category_id)", "(gameactivity.game_id)", document.getElementById('studName').value],
+			"extra" : "group by gameactivity.category_id, game.id"
+		});	
 	}
 
 	function getStudentActivityData(){
@@ -113,39 +124,60 @@
 			var obj = JSON.parse(request.responseText);
 			var gamesList = document.getElementById('game');
 			if(obj.length==0){
-				gamesList.innerHTML="<h3><b>Nothing yet.</b></h3>";
+				alert("No games played yet.");
 			}
 			else{
-				gamesList.innerHTML = "";
-				var table = document.createElement('table');
-				var thead = table.createTHead();
+				var table = document.getElementById('gamesTable');
 				var tbody = table.createTBody();
-				var head = thead.insertRow(0);
-				var headings = [];
-				for(var i=0; i<4; i++){
-					headings.push(head.insertCell(i));
-				}
-
-				headings[0].innerHTML = "Game Link";
-				headings[1].innerHTML = "Game Name";
-				headings[2].innerHTML = "Max Score";
-				headings[3].innerHTML = 'Last Played';
-				table.className= "table table-striped";
-				var j = 0;
-				for(a of obj){
-					var row = tbody.insertRow(j++);
-					var cells = [];
-					for(var i=0; i<4; i++){
-						cells.push(row.insertCell(i));
+				var j =0;
+				for(i in obj){
+					if(i==0 || obj[i]["game.id"]!=obj[i-1]["game.id"]){
+						var row = tbody.insertRow(j++);
+						row.id = obj[i]["game.id"];
+						var cells = [];
+						for(x=0; x<3; x++){
+							cells.push(row.insertCell(x));
+						}
+						cells[0].innerHTML = "<a href='play.jsp?id="+obj[i]["game.id"]+"'><img class='gameImage' src="+obj[i]["game.icon_link"]+"></img></a>";
+						cells[1].innerHTML = obj[i]["category.name"]+'<div class="progress"> <div class="progress-bar progress-bar-striped active" role="progressbar"  aria-valuenow="'+(obj[i]["sum(score)"]/obj[i]["max_score"])*100+'" aria-valuemin="0" aria-valuemax="100" style="width:'+(obj[i]["sum(score)"]/obj[i]["max_score"])*100+'%">'+(obj[i]["sum(score)"]/obj[i]["max_score"])*100+'%</div></div>';
+					}
+					else{
+						table.rows[j].cells[1].innerHTML += obj[i]["category.name"]+'<div class="progress">  <div class="progress-bar progress-bar-striped active" role="progressbar"  aria-valuenow="'+(obj[i]["sum(score)"]/obj[i]["max_score"])*100+'" aria-valuemin="0" aria-valuemax="100" style="width:'+(obj[i]["sum(score)"]/obj[i]["max_score"])*100+'%">'+(obj[i]["sum(score)"]/obj[i]["max_score"])*100+'%</div></div>';
 					}
 
-					cells[0].innerHTML = "<a href='play.jsp?id="+a["game_id"]+"'><img class='gameImage' src="+a.icon_link+"></img></a>";
-					cells[1].innerHTML = "<b>"+a["game.name"]+"</b>";
-					cells[2].innerHTML = a["sum(score)"];
-					cells[3].innerHTML = a["max(last_played)"];
+					sendInfo("gameactivity, activity, topic, stats", "s", putGameActData, {
+						"selections" : ["topic.name", "activity.name", "score", "game_id"],
+						"lhs" : ["gameactivity.topic_id", "gameactivity.activity_id", "game_id", "stats.pair_id", "student_id"],
+						"operator" : ["=", "=", "=", "=", "="],
+						"rhs" : ["(topic.id)", "(activity_id)", obj[i]["game.id"], "(gameactivity.pair_id)", document.getElementById('studName').value]
+					});
 				}
-				gamesList.appendChild(table);
 			}
+		}
+	}
+
+	function putGameActData() {
+		if(request.readyState==4 && request.status == 200){
+
+			var obj = JSON.parse(request.responseText);
+			var options = {
+				legend : 'none',
+				chartArea : {
+					width:'90%',
+					height:'90%'
+				},
+				is3D : true
+			};
+
+			var info = [["Activity-Topic", "Marks"]];
+			for(i in obj){
+				info.push([obj[i]["activity.name"]+"-"+obj[i]["topic.name"], parseInt(obj[i]["score"])]);
+			}
+			console.log(info);
+			var data = google.visualization.arrayToDataTable(info);
+
+			var chart = new google.visualization.PieChart((document.getElementById(obj[0]["game_id"]).cells[2]));
+	        chart.draw(data, options);
 		}
 	}
 

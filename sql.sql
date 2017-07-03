@@ -49,7 +49,7 @@ create table game(
 	creation_date date
 ) auto_increment=0;
 
-create table gameActivity(
+create table gameactivity(
 	game_id int(10) unsigned not null,
 	activity_id int(10) unsigned not null,
 	pair_id int(10) auto_increment primary key,
@@ -86,3 +86,32 @@ create table story_scene(
 -- >>>>>>>> CHANGES <<<<<<<-----
 alter table stats
 add column times_played int default 0;
+
+alter table stats
+add column category_id int ;
+
+create table category(
+	id int auto_increment primary key,
+	name varchar(50) not null
+) auto_increment=0;
+
+create table gamecategory(
+	game_id int,
+	category_id int,
+	max_score int 
+);
+
+alter table gameactivity
+add column contri int default 0;
+
+alter table gameactivity
+add category_id int ;
+
+-- create table contribution(
+-- 	pair_id int not null,
+-- 	percentcontri int(4) not null
+-- );
+
+create table loggedinusers(
+	id varchar(50) primary key
+);
